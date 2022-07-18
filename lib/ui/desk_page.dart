@@ -20,8 +20,12 @@ class DeskPageState extends State<DeskPage>
     with AutomaticKeepAliveClientMixin<DeskPage>, WidgetsBindingObserver {
   AppMenuDbProvider appMenuDbProvider = new AppMenuDbProvider();
   List<AppMenuModel> appMenuModelList = <AppMenuModel>[];
-  List<AppMenuModel> baseMenuLists = <AppMenuModel>[];///基础菜单
-  List<AppMenuModel> expandMenuLists = <AppMenuModel>[];///扩展菜单
+  List<AppMenuModel> baseMenuLists = <AppMenuModel>[];
+
+  ///基础菜单
+  List<AppMenuModel> expandMenuLists = <AppMenuModel>[];
+
+  ///扩展菜单
 
   @override
   void initState() {
@@ -47,42 +51,50 @@ class DeskPageState extends State<DeskPage>
     baseMenuLists = [];
     expandMenuLists = [];
     for (AppMenuModel menu in appMenuModelList) {
-      if (0 == menu.menu_type) {///基础菜单
+      if (0 == menu.menu_type) {
+        ///基础菜单
         baseMenuLists.add(menu);
-      } else if (1 == menu.menu_type) {///扩展菜单
+      } else if (1 == menu.menu_type) {
+        ///扩展菜单
         expandMenuLists.add(menu);
       }
     }
-    print("数据获取完成" +appMenuModelList.length.toString());
+    print("数据获取完成" + appMenuModelList.length.toString());
     setState(() {
       // _getMenuViewData();
     });
   }
 
-  Widget menuView(AppMenuModel item){
-    return Container(
-      margin: EdgeInsets.only(left: 5, top: 10,right: 5),
-      //设置 child 居中
-      alignment: Alignment(0, 0),
-      //边框设置
-      decoration: new BoxDecoration(
-        //背景
-        color: Colors.white,
-        //设置四周圆角 角度
-        borderRadius: BorderRadius.all(Radius.circular(4.0)),
-        //设置四周边框
-        border: new Border.all(width: 1, color: Colors.cyan),
-      ),
-      child: Column(children: [
-        IconButton(
-          icon: Image.network(item.menu_ico),
-          onPressed: () {
-            print(item.menu_name);
-          },
-          iconSize: 50,
+  Widget menuView(AppMenuModel item) {
+    return InkWell(
+      onTap: () {
+        print(item.menu_name);
+      },
+      child: Container(
+        //设置外边距
+        margin: EdgeInsets.only(left: 5, top: 10, right: 5),
+        //设置内边距
+        padding: EdgeInsets.only(top: 10),
+        //设置 child 居中
+        alignment: Alignment(0, 0),
+        //边框设置
+        decoration: new BoxDecoration(
+          //背景
+          color: Colors.white,
+          //设置四周圆角 角度
+          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+          //设置四周边框
+          border: new Border.all(width: 1, color: Colors.cyan),
         ),
-        Text(item.menu_name),
-      ]),
+        child: Column(children: [
+          Image(
+            image: NetworkImage(item.menu_ico),
+            width: 50.0,
+            height: 50.0,
+          ),
+          Text(item.menu_name),
+        ]),
+      ),
     );
   }
 
@@ -106,8 +118,6 @@ class DeskPageState extends State<DeskPage>
     return list;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
@@ -115,9 +125,9 @@ class DeskPageState extends State<DeskPage>
     return Scaffold(
       appBar: AppBar(
         title: Text("工作台"),
-        automaticallyImplyLeading: false,
 
         ///隐藏返回按钮
+        automaticallyImplyLeading: false,
       ),
       body: GridView(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -129,5 +139,4 @@ class DeskPageState extends State<DeskPage>
       ),
     );
   }
-
 }

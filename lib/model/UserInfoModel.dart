@@ -17,6 +17,7 @@ class UserInfoModel {
   late String user_type;
   late String user_uid;
 
+  // UserInfoModel();
 
   UserInfoModel(this.user_app_pwd,this.user_cityname,this.user_comid,
       this.user_comname,this.user_id,this.user_isBingdingPhone,this.user_name,
@@ -39,6 +40,13 @@ class UserInfoModel {
   };
 
   factory UserInfoModel.fromJson(Map<String, dynamic> jsonStr) {
+    // UserInfoModel userInfoModel = new UserInfoModel();
+    // userInfoModel.user_app_pwd = jsonStr['user_app_pwd'];
+    // userInfoModel.user_cityname = jsonStr['user_cityname'];
+    // userInfoModel.user_comid = jsonStr['user_comid'];
+    // userInfoModel.user_app_pwd = jsonStr['user_app_pwd'];
+    // userInfoModel.user_app_pwd = jsonStr['user_app_pwd'];
+    // userInfoModel.user_app_pwd = jsonStr['user_app_pwd'];
     return UserInfoModel(
         jsonStr['user_app_pwd'],
         jsonStr['user_cityname'],
