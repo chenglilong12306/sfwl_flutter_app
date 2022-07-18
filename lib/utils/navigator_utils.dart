@@ -3,6 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sfwl_flutter_app/common/widget/never_overscroll_indicator.dart';
 import 'package:sfwl_flutter_app/ui/home_page.dart';
+import 'package:sfwl_flutter_app/ui/tesla/teslaTaskCarriageMain_page.dart';
+import 'package:sfwl_flutter_app/ui/tesla/teslaTaskMain_page.dart';
+import 'package:sfwl_flutter_app/ui/tesla/teslaTransportManager_page.dart';
 
 /**
  * 导航工具类
@@ -19,6 +22,19 @@ class NavigatorUtils {
   ///跳转首页
   static gotoHomePage(BuildContext context) {
     NavigatorRouter(context, HomePage());
+  }
+
+  ///跳转特斯拉项目
+  static gotoTeslaTransportManagerPage(BuildContext context) {
+    NavigatorRouter(context, TeslaTransportManagerPage());
+  }
+  ///跳转特斯拉项目--项目任务
+  static gotoTeslaTaskMainPage(BuildContext context) {
+    NavigatorRouter(context, TeslaTaskMainPage());
+  }
+  ///跳转特斯拉项目--车厢管理
+  static gotoTeslaTaskCarriageMainPage(BuildContext context) {
+    NavigatorRouter(context, TeslaTaskCarriageMainPage());
   }
 
   ///公共打开方式

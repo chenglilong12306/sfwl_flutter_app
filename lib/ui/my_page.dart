@@ -76,8 +76,8 @@ class MyPageState extends State<MyPage>
                 radius: 50,
                 child: Image.asset(
                   "images/ic_headimg.png",
-                  width: 100,
-                  height: 100,
+                  width: double.tryParse(Constants.Image_icon_size_100),
+                  height: double.tryParse(Constants.Image_icon_size_100),
                 ),
               ),
             ),
@@ -85,7 +85,7 @@ class MyPageState extends State<MyPage>
           Expanded(
             flex: 3,
             child: Container(
-              height: 100,
+              height: double.tryParse(Constants.Image_icon_size_100),
               //设置 child 左方向对对齐
               alignment: Alignment.centerLeft,
               child: Column(
@@ -118,7 +118,7 @@ class MyPageState extends State<MyPage>
           ),
           Image.asset(
             "images/ic_go_struk.png",
-            width: 30.0,
+            width: double.tryParse(Constants.Image_icon_size_30),
           )
         ]),
       ),
@@ -133,7 +133,7 @@ class MyPageState extends State<MyPage>
       margin: EdgeInsets.only(left: 5, top: 20, right: 5),
       //设置 child 居中
       alignment: Alignment(0, 0),
-      height: 50,
+      height: double.tryParse(Constants.Image_icon_size_50),
       //边框设置
       decoration: new BoxDecoration(
         //背景
@@ -151,7 +151,7 @@ class MyPageState extends State<MyPage>
               flex: 1,
               child: Image.asset(
                 "images/ic_security.png",
-                width: 30.0,
+                width: double.tryParse(Constants.Image_icon_size_30),
               )),
           Expanded(
             flex: 4,
@@ -161,7 +161,7 @@ class MyPageState extends State<MyPage>
           ),
           Image.asset(
             "images/ic_go_struk.png",
-            width: 30.0,
+            width: double.tryParse(Constants.Image_icon_size_30),
           )
         ]),
       ),
@@ -176,7 +176,7 @@ class MyPageState extends State<MyPage>
       margin: EdgeInsets.only(left: 5, top: 5, right: 5),
       //设置 child 居中
       alignment: Alignment(0, 0),
-      height: 50,
+      height: double.tryParse(Constants.Image_icon_size_50),
       //边框设置
       decoration: new BoxDecoration(
         //背景
@@ -194,7 +194,7 @@ class MyPageState extends State<MyPage>
               flex: 1,
               child: Image.asset(
                 "images/ic_config.png",
-                width: 30.0,
+                width: double.tryParse(Constants.Image_icon_size_30),
               )),
           Expanded(
             flex: 4,
@@ -204,7 +204,7 @@ class MyPageState extends State<MyPage>
           ),
           Image.asset(
             "images/ic_go_struk.png",
-            width: 30.0,
+            width: double.tryParse(Constants.Image_icon_size_30),
           )
         ]),
       ),
@@ -219,7 +219,7 @@ class MyPageState extends State<MyPage>
       margin: EdgeInsets.only(left: 5, top: 20, right: 5),
       //设置 child 居中
       alignment: Alignment(0, 0),
-      height: 50,
+      height: double.tryParse(Constants.Image_icon_size_50),
       //边框设置
       decoration: new BoxDecoration(
         //背景
@@ -237,7 +237,7 @@ class MyPageState extends State<MyPage>
               flex: 1,
               child: Image.asset(
                 "images/ic_help.png",
-                width: 30.0,
+                width:  double.tryParse(Constants.Image_icon_size_30),
               )),
           Expanded(
             flex: 4,
@@ -247,7 +247,7 @@ class MyPageState extends State<MyPage>
           ),
           Image.asset(
             "images/ic_go_struk.png",
-            width: 30.0,
+            width: double.tryParse(Constants.Image_icon_size_30),
           )
         ]),
       ),
@@ -262,7 +262,7 @@ class MyPageState extends State<MyPage>
       margin: EdgeInsets.only(left: 5, top: 5, right: 5),
       //设置 child 居中
       alignment: Alignment(0, 0),
-      height: 50,
+      height: double.tryParse(Constants.Image_icon_size_50),
       //边框设置
       decoration: new BoxDecoration(
         //背景
@@ -280,7 +280,7 @@ class MyPageState extends State<MyPage>
               flex: 1,
               child: Image.asset(
                 "images/ic_about.png",
-                width: 30.0,
+                width: double.tryParse(Constants.Image_icon_size_30),
               )),
           Expanded(
             flex: 4,
@@ -290,7 +290,7 @@ class MyPageState extends State<MyPage>
           ),
           Image.asset(
             "images/ic_go_struk.png",
-            width: 30.0,
+            width: double.tryParse(Constants.Image_icon_size_30),
           )
         ]),
       ),
@@ -305,7 +305,7 @@ class MyPageState extends State<MyPage>
       margin: EdgeInsets.only(left: 5, top: 5, right: 5),
       //设置 child 居中
       alignment: Alignment(0, 0),
-      height: 50,
+      height: double.tryParse(Constants.Image_icon_size_50),
       //边框设置
       decoration: new BoxDecoration(
         //背景
@@ -323,7 +323,7 @@ class MyPageState extends State<MyPage>
               flex: 1,
               child: Image.asset(
                 "images/ic_share.png",
-                width: 30.0,
+                width: double.tryParse(Constants.Image_icon_size_30),
               )),
           Expanded(
             flex: 4,
@@ -333,7 +333,7 @@ class MyPageState extends State<MyPage>
           ),
           Image.asset(
             "images/ic_go_struk.png",
-            width: 30.0,
+            width: double.tryParse(Constants.Image_icon_size_30),
           )
         ]),
       ),

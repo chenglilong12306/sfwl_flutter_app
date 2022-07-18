@@ -53,4 +53,15 @@ class Constants{
    * 接口地址
    */
   static final String SERVICE_URL = "service_url";
+
+  /*-------------------统一的控件大小-------------------------------*/
+  /**
+   * 内部图标大小
+   */
+  static final String Image_icon_size_100 = "100.0";
+  static final String Image_icon_size_80 = "80.0";
+  static final String Image_icon_size_50 = "50.0";
+  static final String Image_icon_size_30 = "30.0";
+
+
 }

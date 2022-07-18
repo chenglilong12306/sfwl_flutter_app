@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/Global.dart';
 import 'package:sfwl_flutter_app/common/db/provider/AppMenuDbProvider.dart';
 import 'package:sfwl_flutter_app/model/AppMenuModel.dart';
+import 'package:sfwl_flutter_app/utils/navigator_utils.dart';
 
 /**
  * 工作台tab页
@@ -69,6 +71,11 @@ class DeskPageState extends State<DeskPage>
     return InkWell(
       onTap: () {
         print(item.menu_name);
+        if(item.menu_pluginpackage == "com.sfwl.plugins.sfplugteslatransportmanager"){
+          NavigatorUtils.gotoTeslaTransportManagerPage(context);
+        }else{
+          Fluttertoast.showToast(msg: "敬请期待！");
+        }
       },
       child: Container(
         //设置外边距
@@ -89,8 +96,8 @@ class DeskPageState extends State<DeskPage>
         child: Column(children: [
           Image(
             image: NetworkImage(item.menu_ico),
-            width: 50.0,
-            height: 50.0,
+            width:  double.tryParse(Constants.Image_icon_size_50),
+            height:  double.tryParse(Constants.Image_icon_size_50),
           ),
           Text(item.menu_name),
         ]),

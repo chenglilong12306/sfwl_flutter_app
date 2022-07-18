@@ -35,6 +35,7 @@ dependencies:
   convert: ^3.0.0
   build_runner: ^2.0.0
   sqflite: 2.0.1
+  fluttertoast: ^8.0.8
 
   flutter:
     sdk: flutter
@@ -82,6 +83,8 @@ flutter:
      - images/ic_help.png
      - images/ic_security.png
      - images/ic_share.png
+     - images/ico_task.png
+     - images/ico_unload.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
