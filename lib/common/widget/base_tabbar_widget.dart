@@ -130,7 +130,7 @@ class _BaseTabBarState extends State<BaseTabBarWidget>
         bottomNavigationBar: widget.bottomBar,
       );
     }
-    if (widget.type == TabType.top) {
+    if (widget.type == TabType.bottom) {
       ///底部tab bar
       return new Scaffold(
           drawer: widget.drawer,
