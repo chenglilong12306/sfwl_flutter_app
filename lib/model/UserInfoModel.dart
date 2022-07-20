@@ -40,13 +40,6 @@ class UserInfoModel {
   };
 
   factory UserInfoModel.fromJson(Map<String, dynamic> jsonStr) {
-    // UserInfoModel userInfoModel = new UserInfoModel();
-    // userInfoModel.user_app_pwd = jsonStr['user_app_pwd'];
-    // userInfoModel.user_cityname = jsonStr['user_cityname'];
-    // userInfoModel.user_comid = jsonStr['user_comid'];
-    // userInfoModel.user_app_pwd = jsonStr['user_app_pwd'];
-    // userInfoModel.user_app_pwd = jsonStr['user_app_pwd'];
-    // userInfoModel.user_app_pwd = jsonStr['user_app_pwd'];
     return UserInfoModel(
         jsonStr['user_app_pwd'],
         jsonStr['user_cityname'],

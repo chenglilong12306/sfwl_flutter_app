@@ -43,7 +43,7 @@ class HttpUtils {
     };
 
     // 添加迭代器
-    _dio.interceptors.add(interceptor.AuthInterceptor());
+    _dio.interceptors.add(interceptor.AuthInterceptor(_dio));
     if (kDebugMode) {
       _dio.interceptors.add(interceptor.LogInterceptor());
     }

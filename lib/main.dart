@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
@@ -7,8 +8,10 @@ import 'package:sfwl_flutter_app/common/db/provider/AppMenuDbProvider.dart';
 import 'package:sfwl_flutter_app/common/db/provider/UserInfoDbProvider.dart';
 import 'package:sfwl_flutter_app/common/utils/JsonUtil.dart';
 import 'package:sfwl_flutter_app/model/AppMenuModel.dart';
+import 'package:sfwl_flutter_app/model/TokenModel.dart';
 import 'package:sfwl_flutter_app/model/UserInfoModel.dart';
 import 'package:sfwl_flutter_app/model/request/GetMenuModel.dart';
+import 'package:sfwl_flutter_app/model/request/GetTokenModel.dart';
 import 'package:sfwl_flutter_app/ui/home_page.dart';
 import 'package:sfwl_flutter_app/utils/navigator_utils.dart';
 import 'Global.dart';
@@ -177,8 +180,35 @@ class _LoginRouteState extends State<LoginRoute> {
     List<AppMenuModel> appMenuModelList = await appMenuDbProvider
         .getAppMenuInfoByUserId(Global.spUtil.getString(Constants.USERID));
     print("已存入" +appMenuModelList.length.toString());
+    ///获取token
+    getToken();
     NavigatorUtils.gotoHomePage(context);
 
 
+  }
+
+  Future<String> getToken() async {
+    Dio _dio = new Dio();
+    String Atoken = Global.spUtil.getString("Atoken").toString(); //获取当前的Atoken
+    _dio.options.headers['refresh-token'] = Atoken;//设置当前的refreshToken
+    try {
+      String url = Api.baseUrl+Api.tokenUrl; //refreshToken url
+      GetTokenModel getTokenModel = new GetTokenModel(Global.spUtil.get(Constants.USERUID).toString(), Global.spUtil.get(Constants.USERPWD).toString());
+      dynamic params = JsonUtil.setPostRequestParams(json.encode(getTokenModel.toJson()), Global.spUtil.get(Constants.USERID).toString()).toJsonV3();
+      var response = await HttpUtils.instance.post(url, params:params); //请求refreshToken刷新的接口
+      // print(response.toString());
+      ///将服务器返回的内容转成model
+      TokenModel tokenModel = TokenModel.fromJson(response.data);
+      Global.spUtil.setString(Constants.KEY, tokenModel.key);
+      Global.spUtil.setString(Constants.TOKEN, tokenModel.token);
+    } on DioError catch (e) {
+      if(e.response==401){ //401代表refresh_token过期
+        //refreshToken过期，弹出登录页面
+        //解决方法一：封装一个全局的context
+        //return Navigator.of(Util.context).push(new MaterialPageRoute( builder: (ctx) => new LoginPage()))；
+        //解决方法二：当refresh token过期，把退出的登录的操作放在dio网络请求的工具类去操作
+      }
+    }
+    return "accessToken";
   }
 }

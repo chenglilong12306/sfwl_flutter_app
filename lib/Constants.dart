@@ -3,6 +3,14 @@
  */
 class Constants{
   /**
+   * key
+   */
+  static final String KEY    = "Akey";
+  /**
+   * token
+   */
+  static final String TOKEN    = "Atoken";
+  /**
    * 用户id
    */
   static final String USERID    = "user_id";
