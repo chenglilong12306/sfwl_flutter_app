@@ -28,22 +28,38 @@ class AuthInterceptor extends Interceptor {
     if (token != '') {
       options.headers['Authorization'] = key + "_" + md5Token + "_" + timeSpan.toString();
     }
-    // getToken();
     super.onRequest(options, handler);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-
-    // TODO 发送刷新Token请求
-    super.onResponse(response, handler);
+    String str = DataHelper.decodeBase64(response.data);
+    print(response.requestOptions.path);
+    final res = jsonDecode(str);
+    if (res["Code"] == 200) {
+      super.onResponse(response, handler);
+    } else {
+      if (res["Code"] == 401 || res["Code"] == 402 || res["Code"] == 1000) {
+        getToken();
+        RequestOptions options =  response.requestOptions;
+        var token = Global.spUtil.getString(Constants.TOKEN).toString();
+        var key = Global.spUtil.getString(Constants.KEY).toString();
+        int timeSpan =  DateTimeUtil.currentTimeMillis();
+        String md5Token =DataHelper.string2MD5_16(token.toString() + "." + timeSpan.toString());
+        options.headers['Authorization'] = key + "_" + md5Token + "_" + timeSpan.toString();
+        _dio.post(options.path,data:options.data,queryParameters: options.queryParameters);
+        // TODO 发送刷新Token请求
+        super.onResponse(response, handler);
+      }
+    }
   }
+
 
   Future<String> getToken() async {
     String Atoken = Global.spUtil.getString("Atoken").toString(); //获取当前的Atoken
     TokenModel tokenModel = new TokenModel("","");
-    _dio.options.headers['refresh-token'] = Atoken;//设置当前的refreshToken
-
+    Dio dio = new Dio();
+    dio.options.headers['refresh-token'] = Atoken;//设置当前的refreshToken
     try {
       String url = Api.baseUrl+Api.tokenUrl; //refreshToken url
       GetTokenModel getTokenModel = new GetTokenModel(Global.spUtil.get(Constants.USERUID).toString(), Global.spUtil.get(Constants.USERPWD).toString());

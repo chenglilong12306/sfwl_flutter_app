@@ -28,7 +28,7 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
   List<TslTransportTaskInfo> list = <TslTransportTaskInfo>[];
   @override
   void initState() {
-    getDateList();
+    // getDateList();
     super.initState();
   }
 
@@ -42,7 +42,7 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
   }
 
   void getDateList() async {
-    ///登录请求
+    ///正向单据任务请求
     getTslTransportTaskListModel gettaskInfo;
     gettaskInfo = new getTslTransportTaskListModel(Global.spUtil.getString(Constants.USERID).toString(),Global.spUtil.getString(Constants.USERSUPID).toString());
     final res = await HttpUtils.instance.post(
@@ -59,6 +59,7 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
   @override
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
+    getDateList();
     return Scaffold(
       body: Text("特斯拉项目-项目任务-正向"),
     );
