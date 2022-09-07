@@ -23,6 +23,14 @@ class Constants{
    */
   static final String USERPWD = "user_pwd";
   /**
+   * 用户公司ID
+   */
+  static final String USERCOMID = "user_comid";
+  /**
+   * 用户场站ID
+   */
+  static final String USERSUBID = "user_subid";
+  /**
    * 手机号
    */
   static final String USERPHONE = "user_phone";

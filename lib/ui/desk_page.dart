@@ -63,7 +63,6 @@ class DeskPageState extends State<DeskPage>
     }
     print("数据获取完成" + appMenuModelList.length.toString());
     setState(() {
-      // _getMenuViewData();
     });
   }
 

@@ -148,6 +148,9 @@ class _LoginRouteState extends State<LoginRoute> {
     Global.spUtil.setString(Constants.USERID, userInfoModel.user_id);
     Global.spUtil.setString(Constants.USERPWD, userInfoModel.user_app_pwd);
     Global.spUtil.setString(Constants.USERUID, userInfoModel.user_uid);
+    Global.spUtil.setString(Constants.USERCOMID, userInfoModel.user_comid);
+    Global.spUtil.setString(Constants.USERSUBID, userInfoModel.user_subid);
+    Global.spUtil.setString(Constants.USERSUBNAME, userInfoModel.user_subname);
     ///将用户信息存储到数据库中
     UserInfoDbProvider userInfoDbProvider = new UserInfoDbProvider();
     UserInfoModel? user = await userInfoDbProvider.getUserInfo(userInfoModel.user_id);
