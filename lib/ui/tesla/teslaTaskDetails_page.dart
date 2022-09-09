@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/Global.dart';
 import 'package:sfwl_flutter_app/common/net/Api.dart';
@@ -11,6 +11,7 @@ import 'package:sfwl_flutter_app/common/utils/JsonUtil.dart';
 import 'package:sfwl_flutter_app/model/TslTransportTaskInfoModel.dart';
 import 'package:sfwl_flutter_app/model/TslTypeModel.dart';
 import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListModel.dart';
+import 'package:sfwl_flutter_app/utils/LocationUtil.dart';
 
 
 /**
@@ -35,7 +36,9 @@ class TeslaTaskDetailsPageState extends State<TeslaTaskDetailsPage>
   final TslTransportTaskInfo info;
   var selectItemValue;
   List<TslTypeModel> typeModelList = <TslTypeModel>[];
-  String _location = 'Unknown';
+  String _location = '';
+
+  LocationUtil location = LocationUtil();
 
 
 
@@ -48,8 +51,12 @@ class TeslaTaskDetailsPageState extends State<TeslaTaskDetailsPage>
     getTslDelayTypeInfo();
     super.initState();
 
-    // AMapFlutterLocation.setApiKey(
-    //     "anroid ApiKey", "ios ApiKey");
+    location.getCurrentLocation((Map result){
+      print('接收到result:$result');
+      _location = result["address"];
+    }).catchError((err){
+      Fluttertoast.showToast(msg: err);
+    });
 
   }
 
@@ -85,7 +92,10 @@ class TeslaTaskDetailsPageState extends State<TeslaTaskDetailsPage>
   List<DropdownMenuItem<String>> generateItemList() {
     return typeModelList.map<DropdownMenuItem<String>>((TslTypeModel e) {
       return DropdownMenuItem<String>(
-        child: Text(e.name),
+        child: Container(
+          margin:EdgeInsets.only(left: 5) ,
+          child: Text(e.name),
+        ),
         value: e.code,
       );
     }).toList();
@@ -193,6 +203,19 @@ class TeslaTaskDetailsPageState extends State<TeslaTaskDetailsPage>
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
+                      taskTextView("当前位置"),
+                      sizeBoxVertical(),
+                      taskTextViewV2(_location),
+                      sizeBoxVertical(),
+                    ],
+                  ),
+                ),
+                sizeBoxLevel(),
+                Container(
+                  height: 50,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
                       taskTextView("延误类型"),
                       sizeBoxVertical(),
                       // taskTextView(item.load_sendTime.toString()),
@@ -232,7 +255,7 @@ class TeslaTaskDetailsPageState extends State<TeslaTaskDetailsPage>
     return Expanded(
         flex: 2,
         child: Container(
-          alignment: Alignment(0, 0),
+          padding:EdgeInsets.only(left: 5) ,
           child: Text(
             text,
             textScaleFactor: 1.2,
@@ -251,7 +274,10 @@ class TeslaTaskDetailsPageState extends State<TeslaTaskDetailsPage>
           // 下拉列表的数据
           items: generateItemList(),
           hint: DropdownMenuItem<String>(
-            child: Text("请选择"),
+            child:Container(
+              margin:EdgeInsets.only(left: 5) ,
+              child: Text("请选择"),
+            ) ,
             value: "4000",
           ),
           // 改变事件
