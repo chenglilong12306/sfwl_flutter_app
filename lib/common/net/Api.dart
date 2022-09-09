@@ -15,5 +15,7 @@ class Api {
   static const getTslTransportTaskListReturnEmpty = 'Api/TslTransportManager/TslTransportTask/getTslTransportTaskListReturnEmpty';
   /// 获取运输任务历史列表
   static const getTslTransportTaskHistoryList = 'Api/TslTransportManager/TslTransportTask/getTslTransportTaskHistoryList';
+  /// 获取延误类型
+  static const getTslDelayTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslDelayTypeInfo';
 }
 

@@ -1,42 +1,56 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/Global.dart';
 import 'package:sfwl_flutter_app/common/net/Api.dart';
 import 'package:sfwl_flutter_app/common/net/Dio_utils.dart';
 import 'package:sfwl_flutter_app/common/utils/JsonUtil.dart';
 import 'package:sfwl_flutter_app/model/TslTransportTaskInfoModel.dart';
+import 'package:sfwl_flutter_app/model/TslTypeModel.dart';
 import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListModel.dart';
-import 'package:sfwl_flutter_app/ui/tesla/teslaTaskDetails_page.dart';
-import 'package:sfwl_flutter_app/utils/navigator_utils.dart';
+
 
 /**
- * FileName 特斯拉项目管理--项目任务--正向
+ * FileName 特斯拉正向任务详情页面
  * @Author lilong.chen
- * @Date 2022/7/18 15:55
+ * @Date 2022/9/7 14:36
  */
 
-class TeslaTaskListPositivePage extends StatefulWidget {
-  TeslaTaskListPositivePage({Key? super.key});
+class TeslaTaskDetailsPage extends StatefulWidget {
+  final TslTransportTaskInfo info;
+
+  TeslaTaskDetailsPage(this.info, {Key? super.key});
 
   @override
-  TeslaTaskListPositivePageState createState() =>
-      TeslaTaskListPositivePageState();
+  TeslaTaskDetailsPageState createState() => TeslaTaskDetailsPageState(info);
 }
 
-class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
+class TeslaTaskDetailsPageState extends State<TeslaTaskDetailsPage>
     with
-        AutomaticKeepAliveClientMixin<TeslaTaskListPositivePage>,
+        AutomaticKeepAliveClientMixin<TeslaTaskDetailsPage>,
         WidgetsBindingObserver {
-  List<TslTransportTaskInfo> taskInfoList = <TslTransportTaskInfo>[];
+  final TslTransportTaskInfo info;
+  var selectItemValue;
+  List<TslTypeModel> typeModelList = <TslTypeModel>[];
+  String _location = 'Unknown';
+
+
+
+  TeslaTaskDetailsPageState(this.info);
+
+
 
   @override
   void initState() {
-    getDateList();
+    getTslDelayTypeInfo();
     super.initState();
+
+    // AMapFlutterLocation.setApiKey(
+    //     "anroid ApiKey", "ios ApiKey");
+
   }
 
   @override
@@ -48,48 +62,39 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
     super.dispose();
   }
 
-  void getDateList() async {
-    ///正向单据任务请求
+  void getTslDelayTypeInfo() async {
+    ///获取延误类型
     getTslTransportTaskListModel gettaskInfo;
     gettaskInfo = new getTslTransportTaskListModel(
         Global.spUtil.getString(Constants.USERID).toString(),
         Global.spUtil.getString(Constants.USERCOMID).toString());
     final res = await HttpUtils.instance.post(
-      Api.getTslTransportTaskList,
+      Api.getTslDelayTypeInfo,
       params: JsonUtil.setPostRequestParams(json.encode(gettaskInfo.toJson()),
               Global.spUtil.getString(Constants.USERID).toString())
           .toJson(),
       tips: true,
     );
     for (var item in res.data) {
-      TslTransportTaskInfo taskInfoModel = TslTransportTaskInfo.fromJson(item);
-      taskInfoList.add(taskInfoModel);
+      TslTypeModel tslTypeModel = TslTypeModel.fromJson(item);
+      typeModelList.add(tslTypeModel);
     }
     setState(() {});
   }
 
-  List<Widget> _getTaskViewData() {
-    List<Widget> list = [];
-    print("开始渲染数据" + list.length.toString());
-    for (TslTransportTaskInfo item in taskInfoList) {
-      list.add(taskView(item));
-    }
-
-    return list;
+  List<DropdownMenuItem<String>> generateItemList() {
+    return typeModelList.map<DropdownMenuItem<String>>((TslTypeModel e) {
+      return DropdownMenuItem<String>(
+        child: Text(e.name),
+        value: e.code,
+      );
+    }).toList();
   }
 
   Widget taskView(TslTransportTaskInfo item) {
     return InkWell(
-      onTap: () {
-        // Fluttertoast.showToast(msg: item.load_sn);
-        ///跳转特斯拉项目--项目任务--正向任务详情
-        ///带返回刷新数据的跳转
-        Navigator.push(context, MaterialPageRoute(builder: (context) => TeslaTaskDetailsPage(item))).then((value) => getDateList());
-
-      },
+      onTap: () {},
       child: Container(
-        //设置外边距
-        margin: EdgeInsets.only(left:1,top: 5,right: 1,),
         //设置 child 居中
         alignment: Alignment(0, 0),
         //边框设置
@@ -112,96 +117,93 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
                     children: [
                       taskTextView("装车单号"),
                       sizeBoxVertical(),
-                      taskTextView(item.load_sn),
+                      taskTextViewV2(item.load_sn),
                       sizeBoxVertical(),
                     ],
                   ),
                 ),
                 sizeBoxLevel(),
                 Container(
-                  height: 30,
+                  height: 50,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       taskTextView("车牌号码"),
                       sizeBoxVertical(),
-                      taskTextView(item.load_carNumber),
+                      taskTextViewV2(item.load_carNumber),
                       sizeBoxVertical(),
                     ],
                   ),
                 ),
                 sizeBoxLevel(),
                 Container(
-                  height: 30,
+                  height: 50,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       taskTextView("挂车车牌"),
                       sizeBoxVertical(),
-                      taskTextView(item.load_carNumber_cx),
+                      taskTextViewV2(item.load_carNumber_cx),
                       sizeBoxVertical(),
                     ],
                   ),
                 ),
                 sizeBoxLevel(),
                 Container(
-                  height: 30,
+                  height: 50,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       taskTextView("集装箱号"),
                       sizeBoxVertical(),
-                      taskTextView(item.sload_trailerNumber),
+                      taskTextViewV2(item.sload_trailerNumber),
                       sizeBoxVertical(),
                     ],
                   ),
                 ),
                 sizeBoxLevel(),
                 Container(
-                  height: 30,
+                  height: 50,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       taskTextView("封签号码"),
                       sizeBoxVertical(),
-                      taskTextView(item.load_fengqian),
+                      taskTextViewV2(item.load_fengqian),
                       sizeBoxVertical(),
                     ],
                   ),
                 ),
                 sizeBoxLevel(),
                 Container(
-                  height: 30,
+                  height: 50,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      taskTextView("运输方向"),
+                      taskTextView("当前状态"),
                       sizeBoxVertical(),
-                      taskTextView(item.load_Dirs),
+                      taskTextViewV2("yfc" == item.load_state ? "已发车" : "配载中"),
                       sizeBoxVertical(),
                     ],
                   ),
                 ),
                 sizeBoxLevel(),
                 Container(
-                  height: 30,
+                  height: 50,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      taskTextView("发车时间"),
+                      taskTextView("延误类型"),
                       sizeBoxVertical(),
-                      taskTextView(item.load_sendTime.toString()),
+                      // taskTextView(item.load_sendTime.toString()),
+                      typeTextView(),
                       sizeBoxVertical(),
                     ],
                   ),
                 ),
+                sizeBoxLevel(),
               ],
             ),
-          ),
-          sizeBoxVertical(),
-          Image.asset(
-            "images/ic_go_struk.png",
-            width: double.tryParse(Constants.Image_icon_size_30),
           ),
         ]),
       ),
@@ -221,6 +223,51 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
             textScaleFactor: 1.2,
           ),
         ));
+  }
+
+  /**
+   * 列表的文字展示控件
+   */
+  Widget taskTextViewV2(String text) {
+    return Expanded(
+        flex: 2,
+        child: Container(
+          alignment: Alignment(0, 0),
+          child: Text(
+            text,
+            textScaleFactor: 1.2,
+          ),
+        ));
+  }
+
+  /**
+   * 下拉选择控件
+   */
+  Widget typeTextView() {
+    return Expanded(
+      flex: 2,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          // 下拉列表的数据
+          items: generateItemList(),
+          hint: DropdownMenuItem<String>(
+            child: Text("请选择"),
+            value: "4000",
+          ),
+          // 改变事件
+          onChanged: (value) {
+            setState(() {
+              selectItemValue = value.toString();
+            });
+          },
+          value: selectItemValue,
+          // 图标大小
+          iconSize: 48,
+          // 下拉文本样式
+          style: TextStyle(fontSize: 18.0,color: Colors.grey),
+        ),
+      ),
+    );
   }
 
   /**
@@ -252,9 +299,13 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
   @override
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
+
     return Scaffold(
-      body: ListView(
-        children: this._getTaskViewData(),
+      appBar: AppBar(
+        title: Text("任务详情"),
+      ),
+      body: Container(
+        child: taskView(info),
       ),
     );
   }

@@ -79,5 +79,10 @@ class Constants{
   static final String Image_icon_size_50 = "50.0";
   static final String Image_icon_size_30 = "30.0";
 
+  /**
+   * 高德flutter-Android-key
+   */
+  static final String Map_Android_Key = "bbc42f184ffe67a8eda77c50ecc3aad3";
+
 
 }
