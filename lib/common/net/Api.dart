@@ -17,5 +17,9 @@ class Api {
   static const getTslTransportTaskHistoryList = 'Api/TslTransportManager/TslTransportTask/getTslTransportTaskHistoryList';
   /// 获取延误类型
   static const getTslDelayTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslDelayTypeInfo';
+  /// 获取特斯拉--最新位置类型接口
+  static const getTslNewAddressTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslNewAddressTypeInfo';
+  /// 设置装车单状态--正向
+  static const setStartLoadState = 'Api/TslTransportManager/TslTransportTask/setStartLoadState';
 }
 

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:dio/dio.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/Global.dart';
 import 'package:sfwl_flutter_app/common/net/Api.dart';
@@ -50,6 +51,9 @@ class AuthInterceptor extends Interceptor {
         _dio.post(options.path,data:options.data,queryParameters: options.queryParameters);
         // TODO 发送刷新Token请求
         super.onResponse(response, handler);
+      }
+      if (res["Code"] == 400 ) {
+        Fluttertoast.showToast(msg: res["Message"]);
       }
     }
   }

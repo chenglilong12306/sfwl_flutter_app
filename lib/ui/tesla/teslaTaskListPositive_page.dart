@@ -61,6 +61,9 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
           .toJson(),
       tips: true,
     );
+    if(res.data.toString().length > 0){
+      taskInfoList.clear();
+    }
     for (var item in res.data) {
       TslTransportTaskInfo taskInfoModel = TslTransportTaskInfo.fromJson(item);
       taskInfoList.add(taskInfoModel);
