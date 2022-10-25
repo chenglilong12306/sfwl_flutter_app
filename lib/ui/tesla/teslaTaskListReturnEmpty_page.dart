@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/Global.dart';
 import 'package:sfwl_flutter_app/common/net/Api.dart';
@@ -9,8 +8,10 @@ import 'package:sfwl_flutter_app/common/net/Dio_utils.dart';
 import 'package:sfwl_flutter_app/common/utils/DateTimeUitl.dart';
 import 'package:sfwl_flutter_app/common/utils/JsonUtil.dart';
 import 'package:sfwl_flutter_app/model/TslTransportTaskInfoModel.dart';
-import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListModel.dart';
 import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListReturnEmptyModel.dart';
+import 'package:sfwl_flutter_app/ui/tesla/teslaTaskReturnDetails_page.dart';
+
+import '../../model/TslWayillTranExecuteLoadInfoModel.dart';
 
 /**
  * FileName 特斯拉项目管理--项目任务--返空
@@ -32,6 +33,7 @@ class TeslaTaskListReturnEmptyPageState
         AutomaticKeepAliveClientMixin<TeslaTaskListReturnEmptyPage>,
         WidgetsBindingObserver {
   List<TslTransportTaskInfo> taskInfoList = <TslTransportTaskInfo>[];
+  List<TslWayillTranExecuteLoadInfoModel> wayExeList = <TslWayillTranExecuteLoadInfoModel>[];
 
   @override
   void initState() {
@@ -66,8 +68,17 @@ class TeslaTaskListReturnEmptyPageState
           .toJson(),
       tips: true,
     );
+    if(res.data.toString().length > 0){
+      taskInfoList.clear();
+    }
     for (var item in res.data) {
       TslTransportTaskInfo taskInfoModel = TslTransportTaskInfo.fromJson(item);
+      /** 解析获取下级对象list*/
+      // var listDynamic = jsonDecode(json.encode(taskInfoModel.modelList));
+      // List<Map<String, dynamic>> listMap = new List<Map<String, dynamic>>.from(listDynamic);
+      List<TslWayillTranExecuteLoadInfoModel> M = <TslWayillTranExecuteLoadInfoModel>[];
+      new List<Map<String, dynamic>>.from(jsonDecode(json.encode(taskInfoModel.modelList))).forEach((m) => M.add(TslWayillTranExecuteLoadInfoModel.fromJson(m)));
+      taskInfoModel.modelList.add(M);
       taskInfoList.add(taskInfoModel);
     }
 
@@ -87,7 +98,11 @@ class TeslaTaskListReturnEmptyPageState
   Widget taskView(TslTransportTaskInfo item) {
     return InkWell(
       onTap: () {
-        Fluttertoast.showToast(msg: item.load_sn);
+        // Fluttertoast.showToast(msg: item.load_sn);
+        ///跳转特斯拉项目--项目任务--返空任务详情
+        ///带返回刷新数据的跳转
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TeslaTaskReturnDetailsPage(item))).then((value) => getDateList());
+
       },
       child: Container(
         //设置外边距
@@ -119,6 +134,19 @@ class TeslaTaskListReturnEmptyPageState
                       taskTextView("装车单号"),
                       sizeBoxVertical(),
                       taskTextView(item.load_sn),
+                      sizeBoxVertical(),
+                    ],
+                  ),
+                ),
+                sizeBoxLevel(),
+                Container(
+                  height: 30,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      taskTextView("发运编码"),
+                      sizeBoxVertical(),
+                      taskTextView(item.modelList[0]["way_print_sn"]),
                       sizeBoxVertical(),
                     ],
                   ),

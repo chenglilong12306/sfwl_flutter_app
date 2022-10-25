@@ -21,5 +21,7 @@ class Api {
   static const getTslNewAddressTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslNewAddressTypeInfo';
   /// 设置装车单状态--正向
   static const setStartLoadState = 'Api/TslTransportManager/TslTransportTask/setStartLoadState';
+  /// 设置装车单状态--返空
+  static const setStartLoadStateReturnEmpty = 'Api/TslTransportManager/TslTransportTask/setStartLoadStateReturnEmpty';
 }
 

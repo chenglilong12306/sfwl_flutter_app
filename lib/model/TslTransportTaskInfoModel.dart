@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'TslWayillTranExecuteLoadInfoModel.dart';
+
 /**
  * FileName 运输任务列表实体
  * @Author lilong.chen
@@ -117,6 +119,11 @@ class TslTransportTaskInfo {
    */
   late String load_trdState;
 
+  /**
+   * 特斯拉运输--托单、执行、装车单查询返回类列表
+   */
+  late List<dynamic> modelList;
+
   TslTransportTaskInfo(
       this.load_id,
       this.load_addtime,
@@ -139,7 +146,8 @@ class TslTransportTaskInfo {
       this.load_tracType,
       this.load_tracState,
       this.load_tracSource,
-      this.load_trdState);
+      this.load_trdState,
+      this.modelList);
 
   /// jsonDecode(jsonStr) 方法中会调用实体类的这个方法。如果实体类中没有这个方法，会报错。
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -165,6 +173,7 @@ class TslTransportTaskInfo {
         'load_tracState': this.load_tracState,
         'load_tracSource': this.load_tracSource,
         'load_trdState': this.load_trdState,
+        'modelList': this.modelList,
       };
 
   factory TslTransportTaskInfo.fromJson(Map<String, dynamic> jsonStr) {
@@ -185,13 +194,16 @@ class TslTransportTaskInfo {
         jsonStr['load_sendTime'],
         jsonStr['load_other'] != null ? jsonStr['load_other'] : "",
         jsonStr['load_isHaving'] != null ? jsonStr['load_isHaving'] : "",
-        jsonStr['load_beginCityName'] != null ? jsonStr['load_beginCityName'] : "",
+        jsonStr['load_beginCityName'] != null
+            ? jsonStr['load_beginCityName']
+            : "",
         jsonStr['load_endCityName'] != null ? jsonStr['load_endCityName'] : "",
         jsonStr['load_tracid'] != null ? jsonStr['load_tracid'] : "",
         jsonStr['load_tracTnumber'] != null ? jsonStr['load_tracTnumber'] : "",
         jsonStr['load_tracType'] != null ? jsonStr['load_tracType'] : "",
         jsonStr['load_tracState'] != null ? jsonStr['load_tracState'] : "",
         jsonStr['load_tracSource'] != null ? jsonStr['load_tracSource'] : "",
-        jsonStr['load_trdState'] != null ? jsonStr['load_trdState'] : "");
+        jsonStr['load_trdState'] != null ? jsonStr['load_trdState'] : "",
+        jsonStr['modelList']);
   }
 }
