@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/common/widget/base_tabbar_widget.dart';
+import 'package:sfwl_flutter_app/ui/tesla/teslaTaskHistoryList_page.dart';
 import 'package:sfwl_flutter_app/ui/tesla/teslaTaskListMobileCar_page.dart';
 import 'package:sfwl_flutter_app/ui/tesla/teslaTaskListPositive_page.dart';
 import 'package:sfwl_flutter_app/ui/tesla/teslaTaskListReturnEmpty_page.dart';
+
+import '../../utils/navigator_utils.dart';
 
 /**
  * FileName 特斯拉项目管理--项目任务
@@ -77,7 +80,7 @@ class TeslaTaskMainPageState extends State<TeslaTaskMainPage>
           ),
           IconButton(
               onPressed: () {
-                Fluttertoast.showToast(msg: "敬请期待！");
+                NavigatorUtils.gotoTeslaTaskHistoryListPage(context);
               },
               icon: Image.asset("images/ic_history.png"))
         ]),

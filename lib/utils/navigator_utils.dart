@@ -9,6 +9,8 @@ import 'package:sfwl_flutter_app/ui/tesla/teslaTaskDetails_page.dart';
 import 'package:sfwl_flutter_app/ui/tesla/teslaTaskMain_page.dart';
 import 'package:sfwl_flutter_app/ui/tesla/teslaTransportManager_page.dart';
 
+import '../ui/tesla/teslaTaskHistoryList_page.dart';
+
 /**
  * 导航工具类
  * Created by lilong.chen
@@ -38,9 +40,9 @@ class NavigatorUtils {
   static gotoTeslaTaskCarriageMainPage(BuildContext context) {
     NavigatorRouter(context, TeslaTaskCarriageMainPage());
   }
-  ///跳转特斯拉项目--项目任务--正向任务详情
-  static gotoTeslaTaskDetailsPagePage(BuildContext context,TslTransportTaskInfo info) {
-    NavigatorRouter(context, TeslaTaskDetailsPage(info));
+  ///跳转特斯拉项目--项目任务--历史任务
+  static gotoTeslaTaskHistoryListPage(BuildContext context) {
+    NavigatorRouter(context, TeslaTaskHistoryListPage());
   }
 
   ///公共打开方式

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 class Api {
-  static const baseUrl = kDebugMode ? 'http://10.10.10.90:8084/' : 'http://10.10.10.90:8084/';
+  static const baseUrl = kDebugMode ? 'https://appsvcx.sfwl.net/' : 'https://appsvcx.sfwl.net/';
 
   /// 获取token
   static const tokenUrl = 'api/token/getToken';

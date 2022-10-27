@@ -7,6 +7,7 @@ import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/Global.dart';
 import 'package:sfwl_flutter_app/common/net/Api.dart';
 import 'package:sfwl_flutter_app/common/net/Dio_utils.dart';
+import 'package:sfwl_flutter_app/common/utils/DateTimeUitl.dart';
 import 'package:sfwl_flutter_app/common/utils/JsonUtil.dart';
 import 'package:sfwl_flutter_app/model/TslTransportTaskInfoModel.dart';
 import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListModel.dart';
@@ -193,7 +194,7 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
                     children: [
                       taskTextView("发车时间"),
                       sizeBoxVertical(),
-                      taskTextView(item.load_sendTime.toString()),
+                      taskTextView(DateTimeUtil.getDateTimeSwitchString(DateTimeUtil.getTimeStampSwitchDateTime(item.load_sendTime.toInt()),DateTimeUtil.YYYY_MM_DD)),
                       sizeBoxVertical(),
                     ],
                   ),
