@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/Global.dart';
 import 'package:sfwl_flutter_app/common/net/Api.dart';
@@ -10,29 +8,32 @@ import 'package:sfwl_flutter_app/common/net/Dio_utils.dart';
 import 'package:sfwl_flutter_app/common/utils/DateTimeUitl.dart';
 import 'package:sfwl_flutter_app/common/utils/JsonUtil.dart';
 import 'package:sfwl_flutter_app/model/TslTransportTaskInfoModel.dart';
-import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListModel.dart';
-import 'package:sfwl_flutter_app/ui/tesla/teslaTaskDetails_page.dart';
-import 'package:sfwl_flutter_app/utils/navigator_utils.dart';
+import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListReturnEmptyModel.dart';
+import 'package:sfwl_flutter_app/ui/tesla/task_manager/teslaTaskReturnDetails_page.dart';
+
+import '../../../model/TslWayillTranExecuteLoadInfoModel.dart';
 
 /**
- * FileName 特斯拉项目管理--项目任务--正向
+ * FileName 特斯拉项目管理--项目任务--返空
  * @Author lilong.chen
  * @Date 2022/7/18 15:55
  */
 
-class TeslaTaskListPositivePage extends StatefulWidget {
-  TeslaTaskListPositivePage({Key? super.key});
+class TeslaTaskListReturnEmptyPage extends StatefulWidget {
+  TeslaTaskListReturnEmptyPage({Key? super.key});
 
   @override
-  TeslaTaskListPositivePageState createState() =>
-      TeslaTaskListPositivePageState();
+  TeslaTaskListReturnEmptyPageState createState() =>
+      TeslaTaskListReturnEmptyPageState();
 }
 
-class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
+class TeslaTaskListReturnEmptyPageState
+    extends State<TeslaTaskListReturnEmptyPage>
     with
-        AutomaticKeepAliveClientMixin<TeslaTaskListPositivePage>,
+        AutomaticKeepAliveClientMixin<TeslaTaskListReturnEmptyPage>,
         WidgetsBindingObserver {
   List<TslTransportTaskInfo> taskInfoList = <TslTransportTaskInfo>[];
+  List<TslWayillTranExecuteLoadInfoModel> wayExeList = <TslWayillTranExecuteLoadInfoModel>[];
 
   @override
   void initState() {
@@ -50,13 +51,18 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
   }
 
   void getDateList() async {
-    ///正向单据任务请求
-    getTslTransportTaskListModel gettaskInfo;
-    gettaskInfo = new getTslTransportTaskListModel(
+    ///返空单据任务请求
+    getTslTransportTaskListReturnEmptyModel gettaskInfo;
+    gettaskInfo = new getTslTransportTaskListReturnEmptyModel(
         Global.spUtil.getString(Constants.USERID).toString(),
-        Global.spUtil.getString(Constants.USERCOMID).toString());
+        Global.spUtil.getString(Constants.USERCOMID).toString(),
+        DateTimeUtil.getDateTimeSwitchString(DateTimeUtil.getDayDuration(-90), DateTimeUtil.YYYY_MM_DD_HH_MM_SS),
+        DateTimeUtil.getDateTimeSwitchString(
+            DateTimeUtil.getTimeStampSwitchDateTime(
+                DateTimeUtil.currentTimeMillis()),
+            DateTimeUtil.YYYY_MM_DD_HH_MM_SS));
     final res = await HttpUtils.instance.post(
-      Api.getTslTransportTaskList,
+      Api.getTslTransportTaskListReturnEmpty,
       params: JsonUtil.setPostRequestParams(json.encode(gettaskInfo.toJson()),
               Global.spUtil.getString(Constants.USERID).toString())
           .toJson(),
@@ -67,8 +73,15 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
     }
     for (var item in res.data) {
       TslTransportTaskInfo taskInfoModel = TslTransportTaskInfo.fromJson(item);
+      /** 解析获取下级对象list*/
+      // var listDynamic = jsonDecode(json.encode(taskInfoModel.modelList));
+      // List<Map<String, dynamic>> listMap = new List<Map<String, dynamic>>.from(listDynamic);
+      List<TslWayillTranExecuteLoadInfoModel> M = <TslWayillTranExecuteLoadInfoModel>[];
+      new List<Map<String, dynamic>>.from(jsonDecode(json.encode(taskInfoModel.modelList))).forEach((m) => M.add(TslWayillTranExecuteLoadInfoModel.fromJson(m)));
+      taskInfoModel.modelList.add(M);
       taskInfoList.add(taskInfoModel);
     }
+
     setState(() {});
   }
 
@@ -86,14 +99,18 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
     return InkWell(
       onTap: () {
         // Fluttertoast.showToast(msg: item.load_sn);
-        ///跳转特斯拉项目--项目任务--正向任务详情
+        ///跳转特斯拉项目--项目任务--返空任务详情
         ///带返回刷新数据的跳转
-        Navigator.push(context, MaterialPageRoute(builder: (context) => TeslaTaskDetailsPage(item))).then((value) => getDateList());
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TeslaTaskReturnDetailsPage(item))).then((value) => getDateList());
 
       },
       child: Container(
         //设置外边距
-        margin: EdgeInsets.only(left:1,top: 5,right: 1,),
+        margin: EdgeInsets.only(
+          left: 1,
+          top: 5,
+          right: 1,
+        ),
         //设置 child 居中
         alignment: Alignment(0, 0),
         //边框设置
@@ -117,6 +134,19 @@ class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
                       taskTextView("装车单号"),
                       sizeBoxVertical(),
                       taskTextView(item.load_sn),
+                      sizeBoxVertical(),
+                    ],
+                  ),
+                ),
+                sizeBoxLevel(),
+                Container(
+                  height: 30,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      taskTextView("发运编码"),
+                      sizeBoxVertical(),
+                      taskTextView(item.modelList[0]["way_print_sn"]),
                       sizeBoxVertical(),
                     ],
                   ),

@@ -23,5 +23,9 @@ class Api {
   static const setStartLoadState = 'Api/TslTransportManager/TslTransportTask/setStartLoadState';
   /// 设置装车单状态--返空
   static const setStartLoadStateReturnEmpty = 'Api/TslTransportManager/TslTransportTask/setStartLoadStateReturnEmpty';
+  /// 获取特斯拉--车厢类型接口
+  static const getTslVehicleTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslVehicleTypeInfo';
+  /// 获取特斯拉--进/出（停车场/堆场）类型接口
+  static const getTslInOutTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslInOutTypeInfo';
 }
 

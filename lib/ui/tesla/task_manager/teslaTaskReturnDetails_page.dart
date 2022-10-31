@@ -15,7 +15,7 @@ import 'package:sfwl_flutter_app/model/request/SetStartLoadStateModel.dart';
 import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListModel.dart';
 import 'package:sfwl_flutter_app/utils/LocationUtil.dart';
 
-import '../../model/TslWayillTranExecuteLoadInfoModel.dart';
+import '../../../model/TslWayillTranExecuteLoadInfoModel.dart';
 
 /**
  * FileName 特斯拉返空任务详情页面

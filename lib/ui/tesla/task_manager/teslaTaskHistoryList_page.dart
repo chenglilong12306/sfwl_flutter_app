@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:ffi';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sfwl_flutter_app/Constants.dart';
 import 'package:sfwl_flutter_app/Global.dart';
@@ -8,32 +10,29 @@ import 'package:sfwl_flutter_app/common/net/Dio_utils.dart';
 import 'package:sfwl_flutter_app/common/utils/DateTimeUitl.dart';
 import 'package:sfwl_flutter_app/common/utils/JsonUtil.dart';
 import 'package:sfwl_flutter_app/model/TslTransportTaskInfoModel.dart';
-import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListReturnEmptyModel.dart';
-import 'package:sfwl_flutter_app/ui/tesla/teslaTaskReturnDetails_page.dart';
+import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListModel.dart';
 
-import '../../model/TslWayillTranExecuteLoadInfoModel.dart';
+import '../../../model/TslWayillTranExecuteLoadInfoModel.dart';
 
 /**
- * FileName 特斯拉项目管理--项目任务--返空
+ * FileName 特斯拉项目管理--项目任务--历史记录
  * @Author lilong.chen
- * @Date 2022/7/18 15:55
+ * @Date 2022/10/25 15:55
  */
 
-class TeslaTaskListReturnEmptyPage extends StatefulWidget {
-  TeslaTaskListReturnEmptyPage({Key? super.key});
+class TeslaTaskHistoryListPage extends StatefulWidget {
+  TeslaTaskHistoryListPage({Key? super.key});
 
   @override
-  TeslaTaskListReturnEmptyPageState createState() =>
-      TeslaTaskListReturnEmptyPageState();
+  TeslaTaskHistoryListPageState createState() =>
+      TeslaTaskHistoryListPageState();
 }
 
-class TeslaTaskListReturnEmptyPageState
-    extends State<TeslaTaskListReturnEmptyPage>
+class TeslaTaskHistoryListPageState extends State<TeslaTaskHistoryListPage>
     with
-        AutomaticKeepAliveClientMixin<TeslaTaskListReturnEmptyPage>,
+        AutomaticKeepAliveClientMixin<TeslaTaskHistoryListPage>,
         WidgetsBindingObserver {
   List<TslTransportTaskInfo> taskInfoList = <TslTransportTaskInfo>[];
-  List<TslWayillTranExecuteLoadInfoModel> wayExeList = <TslWayillTranExecuteLoadInfoModel>[];
 
   @override
   void initState() {
@@ -51,18 +50,13 @@ class TeslaTaskListReturnEmptyPageState
   }
 
   void getDateList() async {
-    ///返空单据任务请求
-    getTslTransportTaskListReturnEmptyModel gettaskInfo;
-    gettaskInfo = new getTslTransportTaskListReturnEmptyModel(
+    ///历史单据任务请求
+    getTslTransportTaskListModel gettaskInfo;
+    gettaskInfo = new getTslTransportTaskListModel(
         Global.spUtil.getString(Constants.USERID).toString(),
-        Global.spUtil.getString(Constants.USERCOMID).toString(),
-        DateTimeUtil.getDateTimeSwitchString(DateTimeUtil.getDayDuration(-90), DateTimeUtil.YYYY_MM_DD_HH_MM_SS),
-        DateTimeUtil.getDateTimeSwitchString(
-            DateTimeUtil.getTimeStampSwitchDateTime(
-                DateTimeUtil.currentTimeMillis()),
-            DateTimeUtil.YYYY_MM_DD_HH_MM_SS));
+        Global.spUtil.getString(Constants.USERCOMID).toString());
     final res = await HttpUtils.instance.post(
-      Api.getTslTransportTaskListReturnEmpty,
+      Api.getTslTransportTaskHistoryList,
       params: JsonUtil.setPostRequestParams(json.encode(gettaskInfo.toJson()),
               Global.spUtil.getString(Constants.USERID).toString())
           .toJson(),
@@ -74,14 +68,11 @@ class TeslaTaskListReturnEmptyPageState
     for (var item in res.data) {
       TslTransportTaskInfo taskInfoModel = TslTransportTaskInfo.fromJson(item);
       /** 解析获取下级对象list*/
-      // var listDynamic = jsonDecode(json.encode(taskInfoModel.modelList));
-      // List<Map<String, dynamic>> listMap = new List<Map<String, dynamic>>.from(listDynamic);
       List<TslWayillTranExecuteLoadInfoModel> M = <TslWayillTranExecuteLoadInfoModel>[];
       new List<Map<String, dynamic>>.from(jsonDecode(json.encode(taskInfoModel.modelList))).forEach((m) => M.add(TslWayillTranExecuteLoadInfoModel.fromJson(m)));
       taskInfoModel.modelList.add(M);
       taskInfoList.add(taskInfoModel);
     }
-
     setState(() {});
   }
 
@@ -98,19 +89,11 @@ class TeslaTaskListReturnEmptyPageState
   Widget taskView(TslTransportTaskInfo item) {
     return InkWell(
       onTap: () {
-        // Fluttertoast.showToast(msg: item.load_sn);
-        ///跳转特斯拉项目--项目任务--返空任务详情
-        ///带返回刷新数据的跳转
-        Navigator.push(context, MaterialPageRoute(builder: (context) => TeslaTaskReturnDetailsPage(item))).then((value) => getDateList());
 
       },
       child: Container(
         //设置外边距
-        margin: EdgeInsets.only(
-          left: 1,
-          top: 5,
-          right: 1,
-        ),
+        margin: EdgeInsets.only(left:1,top: 5,right: 1,),
         //设置 child 居中
         alignment: Alignment(0, 0),
         //边框设置
@@ -228,14 +211,21 @@ class TeslaTaskListReturnEmptyPageState
                       sizeBoxVertical(),
                     ],
                   ),
+                ),sizeBoxLevel(),
+                Container(
+                  height: 30,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      taskTextView("运输状态"),
+                      sizeBoxVertical(),
+                      taskTextView("已完成"),
+                      sizeBoxVertical(),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-          sizeBoxVertical(),
-          Image.asset(
-            "images/ic_go_struk.png",
-            width: double.tryParse(Constants.Image_icon_size_30),
           ),
         ]),
       ),
@@ -287,6 +277,9 @@ class TeslaTaskListReturnEmptyPageState
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
     return Scaffold(
+      appBar: AppBar(
+        title: Text("历史记录"),
+      ),
       body: ListView(
         children: this._getTaskViewData(),
       ),

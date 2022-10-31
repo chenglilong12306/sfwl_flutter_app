@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
 /**
- * FileName 特斯拉项目管理--车厢管理
+ * FileName 特斯拉项目管理--库存查询
  * @Author lilong.chen
  * @Date 2022/7/18 15:55
  */
 
-class TeslaTaskCarriageMainPage extends StatefulWidget{
-  TeslaTaskCarriageMainPage({Key? super.key});
+class TeslaTaskInventoryQueryPage extends StatefulWidget{
+  TeslaTaskInventoryQueryPage({Key? super.key});
 
   @override
-  TeslaTaskCarriageMainPageState createState() => TeslaTaskCarriageMainPageState();
+  TeslaTaskInventoryQueryPageState createState() => TeslaTaskInventoryQueryPageState();
 }
 
-class TeslaTaskCarriageMainPageState extends State<TeslaTaskCarriageMainPage>
-    with AutomaticKeepAliveClientMixin<TeslaTaskCarriageMainPage>, WidgetsBindingObserver {
+class TeslaTaskInventoryQueryPageState extends State<TeslaTaskInventoryQueryPage>
+    with AutomaticKeepAliveClientMixin<TeslaTaskInventoryQueryPage>, WidgetsBindingObserver {
 
   @override
   void initState() {
@@ -36,9 +36,6 @@ class TeslaTaskCarriageMainPageState extends State<TeslaTaskCarriageMainPage>
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("特斯拉项目-车厢管理"),
-      ),
       body: Column(
         children: <Widget>[
           Row(

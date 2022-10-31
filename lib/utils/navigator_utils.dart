@@ -2,14 +2,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sfwl_flutter_app/common/widget/never_overscroll_indicator.dart';
-import 'package:sfwl_flutter_app/model/TslTransportTaskInfoModel.dart';
 import 'package:sfwl_flutter_app/ui/home_page.dart';
-import 'package:sfwl_flutter_app/ui/tesla/teslaTaskCarriageMain_page.dart';
-import 'package:sfwl_flutter_app/ui/tesla/teslaTaskDetails_page.dart';
-import 'package:sfwl_flutter_app/ui/tesla/teslaTaskMain_page.dart';
+import 'package:sfwl_flutter_app/ui/tesla/carriage_manager/teslaTaskCarriageMain_page.dart';
+import 'package:sfwl_flutter_app/ui/tesla/task_manager/teslaTaskMain_page.dart';
 import 'package:sfwl_flutter_app/ui/tesla/teslaTransportManager_page.dart';
 
-import '../ui/tesla/teslaTaskHistoryList_page.dart';
+import '../ui/tesla/task_manager/teslaTaskHistoryList_page.dart';
 
 /**
  * 导航工具类

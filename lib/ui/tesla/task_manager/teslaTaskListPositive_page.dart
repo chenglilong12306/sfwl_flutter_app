@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,27 +10,26 @@ import 'package:sfwl_flutter_app/common/utils/DateTimeUitl.dart';
 import 'package:sfwl_flutter_app/common/utils/JsonUtil.dart';
 import 'package:sfwl_flutter_app/model/TslTransportTaskInfoModel.dart';
 import 'package:sfwl_flutter_app/model/request/getTslTransportTaskListModel.dart';
-import 'package:sfwl_flutter_app/ui/tesla/teslaTaskDetails_page.dart';
 
-import '../../model/TslWayillTranExecuteLoadInfoModel.dart';
+import 'teslaTaskDetails_page.dart';
 
 /**
- * FileName 特斯拉项目管理--项目任务--历史记录
+ * FileName 特斯拉项目管理--项目任务--正向
  * @Author lilong.chen
- * @Date 2022/10/25 15:55
+ * @Date 2022/7/18 15:55
  */
 
-class TeslaTaskHistoryListPage extends StatefulWidget {
-  TeslaTaskHistoryListPage({Key? super.key});
+class TeslaTaskListPositivePage extends StatefulWidget {
+  TeslaTaskListPositivePage({Key? super.key});
 
   @override
-  TeslaTaskHistoryListPageState createState() =>
-      TeslaTaskHistoryListPageState();
+  TeslaTaskListPositivePageState createState() =>
+      TeslaTaskListPositivePageState();
 }
 
-class TeslaTaskHistoryListPageState extends State<TeslaTaskHistoryListPage>
+class TeslaTaskListPositivePageState extends State<TeslaTaskListPositivePage>
     with
-        AutomaticKeepAliveClientMixin<TeslaTaskHistoryListPage>,
+        AutomaticKeepAliveClientMixin<TeslaTaskListPositivePage>,
         WidgetsBindingObserver {
   List<TslTransportTaskInfo> taskInfoList = <TslTransportTaskInfo>[];
 
@@ -51,13 +49,13 @@ class TeslaTaskHistoryListPageState extends State<TeslaTaskHistoryListPage>
   }
 
   void getDateList() async {
-    ///历史单据任务请求
+    ///正向单据任务请求
     getTslTransportTaskListModel gettaskInfo;
     gettaskInfo = new getTslTransportTaskListModel(
         Global.spUtil.getString(Constants.USERID).toString(),
         Global.spUtil.getString(Constants.USERCOMID).toString());
     final res = await HttpUtils.instance.post(
-      Api.getTslTransportTaskHistoryList,
+      Api.getTslTransportTaskList,
       params: JsonUtil.setPostRequestParams(json.encode(gettaskInfo.toJson()),
               Global.spUtil.getString(Constants.USERID).toString())
           .toJson(),
@@ -68,10 +66,6 @@ class TeslaTaskHistoryListPageState extends State<TeslaTaskHistoryListPage>
     }
     for (var item in res.data) {
       TslTransportTaskInfo taskInfoModel = TslTransportTaskInfo.fromJson(item);
-      /** 解析获取下级对象list*/
-      List<TslWayillTranExecuteLoadInfoModel> M = <TslWayillTranExecuteLoadInfoModel>[];
-      new List<Map<String, dynamic>>.from(jsonDecode(json.encode(taskInfoModel.modelList))).forEach((m) => M.add(TslWayillTranExecuteLoadInfoModel.fromJson(m)));
-      taskInfoModel.modelList.add(M);
       taskInfoList.add(taskInfoModel);
     }
     setState(() {});
@@ -90,6 +84,10 @@ class TeslaTaskHistoryListPageState extends State<TeslaTaskHistoryListPage>
   Widget taskView(TslTransportTaskInfo item) {
     return InkWell(
       onTap: () {
+        // Fluttertoast.showToast(msg: item.load_sn);
+        ///跳转特斯拉项目--项目任务--正向任务详情
+        ///带返回刷新数据的跳转
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TeslaTaskDetailsPage(item))).then((value) => getDateList());
 
       },
       child: Container(
@@ -118,19 +116,6 @@ class TeslaTaskHistoryListPageState extends State<TeslaTaskHistoryListPage>
                       taskTextView("装车单号"),
                       sizeBoxVertical(),
                       taskTextView(item.load_sn),
-                      sizeBoxVertical(),
-                    ],
-                  ),
-                ),
-                sizeBoxLevel(),
-                Container(
-                  height: 30,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      taskTextView("发运编码"),
-                      sizeBoxVertical(),
-                      taskTextView(item.modelList[0]["way_print_sn"]),
                       sizeBoxVertical(),
                     ],
                   ),
@@ -212,21 +197,14 @@ class TeslaTaskHistoryListPageState extends State<TeslaTaskHistoryListPage>
                       sizeBoxVertical(),
                     ],
                   ),
-                ),sizeBoxLevel(),
-                Container(
-                  height: 30,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      taskTextView("运输状态"),
-                      sizeBoxVertical(),
-                      taskTextView("已完成"),
-                      sizeBoxVertical(),
-                    ],
-                  ),
                 ),
               ],
             ),
+          ),
+          sizeBoxVertical(),
+          Image.asset(
+            "images/ic_go_struk.png",
+            width: double.tryParse(Constants.Image_icon_size_30),
           ),
         ]),
       ),
@@ -278,9 +256,6 @@ class TeslaTaskHistoryListPageState extends State<TeslaTaskHistoryListPage>
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
     return Scaffold(
-      appBar: AppBar(
-        title: Text("历史记录"),
-      ),
       body: ListView(
         children: this._getTaskViewData(),
       ),
