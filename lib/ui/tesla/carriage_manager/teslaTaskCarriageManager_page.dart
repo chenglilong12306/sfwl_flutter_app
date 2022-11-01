@@ -10,6 +10,7 @@ import '../../../common/net/Api.dart';
 import '../../../common/net/Dio_utils.dart';
 import '../../../common/utils/JsonUtil.dart';
 import '../../../model/TslTypeModel.dart';
+import '../../../model/request/getTeslaCarTrackAreaInfoModel.dart';
 import '../../../model/request/getTslInOutTypeInfoModel.dart';
 import '../../../model/request/getTslTransportTaskListModel.dart';
 import '../../../utils/LocationUtil.dart';
@@ -33,16 +34,20 @@ class TeslaTaskCarriageManagerPageState
     with
         AutomaticKeepAliveClientMixin<TeslaTaskCarriageManagerPage>,
         WidgetsBindingObserver {
-
   /**库区库位行列数*/
-  List<int> areaLineInfo = <int>[];
-  List<int> areaColumnInfo = <int>[];
+  List<String> areaLineInfoList = <String>[];
+  var areaLineInfoValue;
+  List<String> areaColumnInfoList = <String>[];
+  var areaColumnInfoValue;
+
   /**库区列表*/
   List<TslCarTrackAreaInfoModel> areaList = <TslCarTrackAreaInfoModel>[];
+  var areaListValue;
 
   /**车厢停放位置*/
   var addressSelectItemValue;
   List<TslTypeModel> addressModelList = <TslTypeModel>[];
+
   /**车厢类型接口*/
   var vehicleTypeInfoValue;
   List<TslTypeModel> vehicleTypeInfoList = <TslTypeModel>[];
@@ -54,8 +59,10 @@ class TeslaTaskCarriageManagerPageState
   /**进出类型*/
   var inOutTypeInfoValue = "";
   List<TslTypeModel> inOutTypeInfoList = <TslTypeModel>[];
+
   /*进入*/
   List<TslTypeModel> inOutTypeInfoList1 = <TslTypeModel>[];
+
   /*离开*/
   List<TslTypeModel> inOutTypeInfoList3 = <TslTypeModel>[];
   String _loadAddress = '';
@@ -109,8 +116,9 @@ class TeslaTaskCarriageManagerPageState
     }
     setState(() {});
   }
+
   void getTslVehicleTypeInfo() async {
-    ///获取车厢停放位置类型
+    ///获取车厢类型
     getTslTransportTaskListModel gettaskInfo;
     gettaskInfo = new getTslTransportTaskListModel(
         Global.spUtil.getString(Constants.USERID).toString(),
@@ -131,29 +139,62 @@ class TeslaTaskCarriageManagerPageState
 
   void getTslInOutTypeInfo(String action) async {
     ///获取特斯拉--进/出（停车场/堆场）类型接口
-    if("" != action) {
-      getTslInOutTypeInfoModel getTslInOutTypeInfo = new getTslInOutTypeInfoModel(
-          action);
+    if ("" != action) {
+      getTslInOutTypeInfoModel getTslInOutTypeInfo =
+          new getTslInOutTypeInfoModel(action);
       final res = await HttpUtils.instance.post(
         Api.getTslInOutTypeInfo,
         params: JsonUtil.setPostRequestParams(json.encode(getTslInOutTypeInfo),
-            Global.spUtil.getString(Constants.USERID).toString())
+                Global.spUtil.getString(Constants.USERID).toString())
             .toJson(),
         tips: true,
       );
       for (var item in res.data) {
         TslTypeModel tslTypeModel = TslTypeModel.fromJson(item);
-        if("1" == action){
+        if ("1" == action) {
           inOutTypeInfoList1.add(tslTypeModel);
         }
-        if("3" == action){
+        if ("3" == action) {
           inOutTypeInfoList3.add(tslTypeModel);
         }
       }
-      setState(() {
-
-      });
+      setState(() {});
     }
+  }
+
+  void getTeslaCarTrackAreaInfoList(String area_locationType) async {
+    ///根据位置类型查询库区
+    getTeslaCarTrackAreaInfoModel getTeslaCarTrackAreaInfo =
+        new getTeslaCarTrackAreaInfoModel(
+            area_locationType,
+            Global.spUtil.getString(Constants.USERID).toString(),
+            Global.spUtil.getString(Constants.USERCOMID).toString());
+    final res = await HttpUtils.instance.post(
+      Api.getTeslaCarTrackAreaInfoList,
+      params: JsonUtil.setPostRequestParams(
+              json.encode(getTeslaCarTrackAreaInfo),
+              Global.spUtil.getString(Constants.USERID).toString())
+          .toJson(),
+      tips: true,
+    );
+    for (var item in res.data) {
+      TslCarTrackAreaInfoModel trackAreaInfoModel =
+          TslCarTrackAreaInfoModel.fromJson(item);
+      areaList.add(trackAreaInfoModel);
+      if (areaLineInfoList.length > 0) {
+        areaLineInfoList.clear();
+      }
+      if (areaColumnInfoList.length > 0) {
+        areaColumnInfoList.clear();
+      }
+      for (int i = 0; i < trackAreaInfoModel.area_lineSum; i++) {
+        areaLineInfoList.add((i + 1).toString());
+      }
+      for (int i = 0; i < trackAreaInfoModel.area_columnSum; i++) {
+        areaColumnInfoList.add((i + 1).toString());
+      }
+    }
+    setState(() {});
   }
 
   @override
@@ -206,6 +247,22 @@ class TeslaTaskCarriageManagerPageState
         ));
   }
 
+  /**
+   * 列表的文字展示控件
+   */
+  Widget taskTextView2(String text) {
+    return Expanded(
+        flex: 1,
+        child: Container(
+          alignment: Alignment(0, 0),
+          child: Text(
+            text,
+            style: TextStyle(color: Colors.lightBlue),
+            textScaleFactor: 1.2,
+          ),
+        ));
+  }
+
   List<DropdownMenuItem<String>> generateItemList(List<TslTypeModel> list) {
     return list.map<DropdownMenuItem<String>>((TslTypeModel e) {
       return DropdownMenuItem<String>(
@@ -239,6 +296,7 @@ class TeslaTaskCarriageManagerPageState
           onChanged: (value) {
             setState(() {
               addressSelectItemValue = value.toString();
+              getTeslaCarTrackAreaInfoList(addressSelectItemValue);
             });
           },
           value: addressSelectItemValue,
@@ -250,6 +308,7 @@ class TeslaTaskCarriageManagerPageState
       ),
     );
   }
+
   /**
    * 车厢类型下拉选择控件
    */
@@ -282,6 +341,7 @@ class TeslaTaskCarriageManagerPageState
       ),
     );
   }
+
   /**
    * 联动下拉选择框--一级下拉选择控件
    */
@@ -303,10 +363,10 @@ class TeslaTaskCarriageManagerPageState
           onChanged: (value) {
             setState(() {
               inOutInfoValue = value.toString();
-              if("1" == inOutInfoValue){
+              if ("1" == inOutInfoValue) {
                 inOutTypeInfoList = inOutTypeInfoList1;
               }
-              if("3" == inOutInfoValue){
+              if ("3" == inOutInfoValue) {
                 inOutTypeInfoList = inOutTypeInfoList3;
               }
               inOutTypeInfoValue = inOutTypeInfoList[0].code;
@@ -321,6 +381,7 @@ class TeslaTaskCarriageManagerPageState
       ),
     );
   }
+
   /**
    * 联动下拉选择框--二级下拉选择控件
    */
@@ -328,7 +389,7 @@ class TeslaTaskCarriageManagerPageState
     return Expanded(
       flex: 2,
       child: DropdownButtonHideUnderline(
-        child : DropdownButton<String>(
+        child: DropdownButton<String>(
           // 下拉列表的数据
           items: generateItemList(list),
           hint: DropdownMenuItem<String>(
@@ -345,6 +406,88 @@ class TeslaTaskCarriageManagerPageState
             });
           },
           value: inOutTypeInfoValue,
+          // 图标大小
+          iconSize: 24,
+          // 下拉文本样式
+          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+        ),
+      ),
+    );
+  }
+
+  /**
+   * 库区-行-下拉选择控件
+   */
+  Widget areaLineInfoTextView(List<String> list) {
+    return Expanded(
+      flex: 1,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          // 下拉列表的数据
+          items: list.map<DropdownMenuItem<String>>((String e) {
+            return DropdownMenuItem<String>(
+              child: Container(
+                margin: EdgeInsets.only(left: 5),
+                child: Text(e),
+              ),
+              value: e,
+            );
+          }).toList(),
+          hint: DropdownMenuItem<String>(
+            child: Container(
+              margin: EdgeInsets.only(left: 5),
+              child: Text(list.length == 0 ? "" : list[0]),
+            ),
+            value: list.length == 0 ? "0" : list[0],
+          ),
+          // 改变事件
+          onChanged: (value) {
+            setState(() {
+              areaLineInfoValue = value.toString();
+            });
+          },
+          value: areaLineInfoValue,
+          // 图标大小
+          iconSize: 24,
+          // 下拉文本样式
+          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+        ),
+      ),
+    );
+  }
+
+  /**
+   * 库区-列-下拉选择控件
+   */
+  Widget areaColumnInfoTextView(List<String> list) {
+    return Expanded(
+      flex: 1,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          // 下拉列表的数据
+          items: list.map<DropdownMenuItem<String>>((String e) {
+            return DropdownMenuItem<String>(
+              child: Container(
+                margin: EdgeInsets.only(left: 5),
+                child: Text(e),
+              ),
+              value: e,
+            );
+          }).toList(),
+          hint: DropdownMenuItem<String>(
+            child: Container(
+              margin: EdgeInsets.only(left: 5),
+              child: Text(list.length == 0 ? "" : list[0]),
+            ),
+            value: list.length == 0 ? "0" : list[0],
+          ),
+          // 改变事件
+          onChanged: (value) {
+            setState(() {
+              areaColumnInfoValue = value.toString();
+            });
+          },
+          value: areaColumnInfoValue,
           // 图标大小
           iconSize: 24,
           // 下拉文本样式
@@ -409,10 +552,36 @@ class TeslaTaskCarriageManagerPageState
             mainAxisSize: MainAxisSize.max,
             children: [
               sizeBoxVertical(),
-              taskTextView("位置类型"),
+              taskTextView("所在场所"),
               sizeBoxVertical(),
               addressTypeTextView(addressModelList),
               sizeBoxVertical(),
+            ],
+          ),
+        ),
+        sizeBoxLevel(),
+        Container(
+          height: 50,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              sizeBoxVertical(),
+              taskTextView("库区位置"),
+              sizeBoxVertical(),
+              Expanded(
+                flex: 2,
+                child: Row(
+                  children: [
+                    taskTextView2(
+                        areaListValue == null ? "库区" : areaList[0].area_name),
+                    sizeBoxVertical(),
+                    areaLineInfoTextView(areaLineInfoList),
+                    sizeBoxVertical(),
+                    areaColumnInfoTextView(areaColumnInfoList),
+                    sizeBoxVertical(),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -458,6 +627,73 @@ class TeslaTaskCarriageManagerPageState
     );
   }
 
+  Widget areaView(TslCarTrackAreaInfoModel item) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          areaListValue = item.area_name;
+        });
+
+        Fluttertoast.showToast(msg: item.area_name);
+      },
+      child: Container(
+        //设置外边距
+        margin: EdgeInsets.all(2),
+        //设置内边距
+        padding: EdgeInsets.only(top: 5),
+        //设置 child 居中
+        alignment: Alignment(0, 0),
+        //边框设置
+        decoration: new BoxDecoration(
+          //背景
+          color: Colors.white,
+          //设置四周圆角 角度
+          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+          //设置四周边框
+          border: new Border.all(width: 1, color: Colors.lightBlue),
+        ),
+        child: Column(children: [
+          Text(item.area_name),
+        ]),
+      ),
+    );
+  }
+
+  /**
+   * 获取库区UI
+   */
+  List<Widget> _getAreaViewData() {
+    ///调用获取库区数据方法
+    List<Widget> list = [];
+    for (TslCarTrackAreaInfoModel item in areaList) {
+      list.add(areaView(item));
+    }
+    return list;
+  }
+
+  /**
+   * 获取库区UI
+   */
+  Widget _areaViewData() {
+    return GridView(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+
+        ///列数
+        mainAxisSpacing: 2,
+
+        ///主轴之间的间距
+        crossAxisSpacing: 2,
+
+        ///横轴之间的间距
+        childAspectRatio: 2.0,
+
+        ///设置宽高的比例 GridView的子组件直接设置宽高没有反应，可以通过childAspectRatio修改宽高
+      ),
+      children: this._getAreaViewData(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
@@ -469,6 +705,12 @@ class TeslaTaskCarriageManagerPageState
           children: <Widget>[
             carCxNumberEditView(),
             carriageView(),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(top: 5),
+                child: _areaViewData(),
+              ),
+            ),
           ],
         ),
       ),

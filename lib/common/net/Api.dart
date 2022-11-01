@@ -27,5 +27,7 @@ class Api {
   static const getTslVehicleTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslVehicleTypeInfo';
   /// 获取特斯拉--进/出（停车场/堆场）类型接口
   static const getTslInOutTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslInOutTypeInfo';
+  /// 根据位置类型查询库区
+  static const getTeslaCarTrackAreaInfoList = 'Api/TslTransportManager/TslTransportTask/getTeslaCarTrackAreaInfoList';
 }
 

@@ -25,7 +25,7 @@ class TslCarTrackAreaInfoModel{
   /**
    * 创建时间
    */
-  late num area_addtime;
+  late String area_addtime;
 
   /**
    * 创建人  系统初始化，默认系统管理员：00000000-0000-0000-0000-000000000000
@@ -40,7 +40,7 @@ class TslCarTrackAreaInfoModel{
   /**
    * 修改时间
    */
-  late num area_modifyTime;
+  late String area_modifyTime;
 
   /**
    * 序号
