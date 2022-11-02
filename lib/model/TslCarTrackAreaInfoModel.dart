@@ -61,6 +61,8 @@ class TslCarTrackAreaInfoModel{
    */
   late int area_StoAreaSum;
 
+  late bool area_isSelect = false;
+
   TslCarTrackAreaInfoModel(
       this.area_id,
       this.area_locationType,
@@ -72,7 +74,8 @@ class TslCarTrackAreaInfoModel{
       this.area_serialNumber,
       this.area_lineSum,
       this.area_columnSum,
-      this.area_StoAreaSum
+      this.area_StoAreaSum,
+      this.area_isSelect
       );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -86,7 +89,8 @@ class TslCarTrackAreaInfoModel{
     'area_serialNumber': this.area_serialNumber,
     'area_lineSum': this.area_lineSum,
     'area_columnSum': this.area_columnSum,
-    'area_StoAreaSum': this.area_StoAreaSum
+    'area_StoAreaSum': this.area_StoAreaSum,
+    'area_isSelect': this.area_isSelect
   };
 
 
@@ -102,7 +106,8 @@ class TslCarTrackAreaInfoModel{
         jsonStr['area_serialNumber'],
         jsonStr['area_lineSum'] != null ? jsonStr['area_lineSum'] : "",
         jsonStr['area_columnSum'] != null ? jsonStr['area_columnSum'] : "",
-        jsonStr['area_StoAreaSum']);
+        jsonStr['area_StoAreaSum'],
+        jsonStr['area_isSelect'] == null ? false : true);
   }
 
 }

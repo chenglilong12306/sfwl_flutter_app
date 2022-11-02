@@ -29,5 +29,7 @@ class Api {
   static const getTslInOutTypeInfo = 'Api/TslTransportManager/TslTransportTask/getTslInOutTypeInfo';
   /// 根据位置类型查询库区
   static const getTeslaCarTrackAreaInfoList = 'Api/TslTransportManager/TslTransportTask/getTeslaCarTrackAreaInfoList';
+  /// 获取车辆信息列表
+  static const getCarInfoList = 'Api/TslTransportManager/TslTransportTask/getCarInfoList';
 }
 

@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:sfwl_flutter_app/model/BasCarInfoModel.dart';
 import 'package:sfwl_flutter_app/model/TslCarTrackAreaInfoModel.dart';
+import 'package:sfwl_flutter_app/model/request/getCarInfoListModel.dart';
 
 import '../../../Constants.dart';
 import '../../../Global.dart';
@@ -34,6 +36,13 @@ class TeslaTaskCarriageManagerPageState
     with
         AutomaticKeepAliveClientMixin<TeslaTaskCarriageManagerPage>,
         WidgetsBindingObserver {
+  TextEditingController _carNumberController = TextEditingController();
+  var carNumberVisible = false;
+
+  /**库区列表*/
+  List<BasCarInfoModel> carInfoList = <BasCarInfoModel>[];
+  var carInfo;
+
   /**库区库位行列数*/
   List<String> areaLineInfoList = <String>[];
   var areaLineInfoValue;
@@ -45,7 +54,7 @@ class TeslaTaskCarriageManagerPageState
   var areaListValue;
 
   /**车厢停放位置*/
-  var addressSelectItemValue;
+  var addressSelectItemValue = "tcc";
   List<TslTypeModel> addressModelList = <TslTypeModel>[];
 
   /**车厢类型接口*/
@@ -76,6 +85,7 @@ class TeslaTaskCarriageManagerPageState
     getTslVehicleTypeInfo();
     getTslInOutTypeInfo("1");
     getTslInOutTypeInfo("3");
+    getTeslaCarTrackAreaInfoList(addressSelectItemValue);
     /**初始化进出类型--进出*/
     inOutInfoList.add(TslTypeModel("", "请选择"));
     inOutInfoList.add(TslTypeModel("1", "进入"));
@@ -177,6 +187,10 @@ class TeslaTaskCarriageManagerPageState
           .toJson(),
       tips: true,
     );
+    areaList.clear();
+    areaListValue = null;
+    areaLineInfoValue = "1";
+    areaColumnInfoValue = "1";
     for (var item in res.data) {
       TslCarTrackAreaInfoModel trackAreaInfoModel =
           TslCarTrackAreaInfoModel.fromJson(item);
@@ -193,6 +207,32 @@ class TeslaTaskCarriageManagerPageState
       for (int i = 0; i < trackAreaInfoModel.area_columnSum; i++) {
         areaColumnInfoList.add((i + 1).toString());
       }
+    }
+    setState(() {});
+  }
+
+  void getCarInfoList(String carNumber) async {
+    ///获取车厢停放位置类型
+    getCarInfoListModel getCarInfoList;
+    getCarInfoList = new getCarInfoListModel(
+        Global.spUtil.getString(Constants.USERID).toString(),
+        Global.spUtil.getString(Constants.USERCOMID).toString(),
+        carNumber);
+    final res = await HttpUtils.instance.post(
+      Api.getCarInfoList,
+      params: JsonUtil.setPostRequestParams(
+              json.encode(getCarInfoList.toJson()),
+              Global.spUtil.getString(Constants.USERID).toString())
+          .toJson(),
+      tips: true,
+    );
+    carInfoList.clear();
+    for (var item in res.data) {
+      BasCarInfoModel carInfoModel = BasCarInfoModel.fromJson(item);
+      carInfoList.add(carInfoModel);
+    }
+    if (carInfoList.length > 0) {
+      carNumberVisible = true;
     }
     setState(() {});
   }
@@ -294,10 +334,9 @@ class TeslaTaskCarriageManagerPageState
           ),
           // 改变事件
           onChanged: (value) {
-            setState(() {
-              addressSelectItemValue = value.toString();
-              getTeslaCarTrackAreaInfoList(addressSelectItemValue);
-            });
+            addressSelectItemValue = value.toString();
+            getTeslaCarTrackAreaInfoList(addressSelectItemValue);
+            setState(() {});
           },
           value: addressSelectItemValue,
           // 图标大小
@@ -507,13 +546,16 @@ class TeslaTaskCarriageManagerPageState
         Expanded(
           child: // 单行文本输入框
               TextField(
+            controller: _carNumberController,
             decoration: InputDecoration(
               hintText: "请输入车厢号",
             ),
           ),
         ),
         InkWell(
-          onTap: () {},
+          onTap: () {
+            getCarInfoList(_carNumberController.text);
+          },
           child: Container(
             //设置外边距
             margin: EdgeInsets.all(10),
@@ -573,7 +615,7 @@ class TeslaTaskCarriageManagerPageState
                 child: Row(
                   children: [
                     taskTextView2(
-                        areaListValue == null ? "库区" : areaList[0].area_name),
+                        areaListValue == null ? "选择库区" : areaListValue),
                     sizeBoxVertical(),
                     areaLineInfoTextView(areaLineInfoList),
                     sizeBoxVertical(),
@@ -630,9 +672,14 @@ class TeslaTaskCarriageManagerPageState
   Widget areaView(TslCarTrackAreaInfoModel item) {
     return InkWell(
       onTap: () {
-        setState(() {
-          areaListValue = item.area_name;
-        });
+        areaListValue = item.area_name;
+        areaLineInfoValue = "1";
+        areaColumnInfoValue = "1";
+        for (TslCarTrackAreaInfoModel model in areaList) {
+          model.area_isSelect = false;
+        }
+        item.area_isSelect = true;
+        setState(() {});
 
         Fluttertoast.showToast(msg: item.area_name);
       },
@@ -646,14 +693,19 @@ class TeslaTaskCarriageManagerPageState
         //边框设置
         decoration: new BoxDecoration(
           //背景
-          color: Colors.white,
+          color: item.area_isSelect == true ? Colors.lightBlue : Colors.white,
           //设置四周圆角 角度
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
           //设置四周边框
           border: new Border.all(width: 1, color: Colors.lightBlue),
         ),
         child: Column(children: [
-          Text(item.area_name),
+          Text(
+            item.area_name,
+            style: TextStyle(
+              color: item.area_isSelect == true ? Colors.white : Colors.black,
+            ),
+          ),
         ]),
       ),
     );
@@ -694,6 +746,81 @@ class TeslaTaskCarriageManagerPageState
     );
   }
 
+  /**
+   * 展示车辆列表信息
+   */
+  List<Widget> _getCarInfoListViewData() {
+    List<Widget> list = [];
+    print("开始渲染数据" + list.length.toString());
+    for (BasCarInfoModel item in carInfoList) {
+      list.add(_carInfoView(item));
+    }
+
+    return list;
+  }
+
+  Widget _carInfoView(BasCarInfoModel item) {
+    return InkWell(
+      onTap: () {
+        // Fluttertoast.showToast(msg: item.car_number);
+        _carNumberController.text = item.car_number;
+        carInfo = item;
+        carInfoList.clear();
+        carNumberVisible = false;
+        setState(() {});
+
+      },
+      child: Container(
+        //设置外边距
+        margin: EdgeInsets.only(
+          left: 1,
+          top: 5,
+          right: 1,
+        ),
+        //设置 child 居中
+        alignment: Alignment(0, 0),
+        //边框设置
+        decoration: new BoxDecoration(
+          //背景
+          color: Colors.white,
+          //设置四周边框
+          border: new Border.all(width: 1, color: Colors.grey),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              ///Expanded 按比例占据空间
+              flex: 1,
+              child: Column(
+                children: [
+                  Container(
+                    height: 30,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        taskTextView(item.car_number),
+                      ],
+                    ),
+                  ),
+                  sizeBoxLevel(),
+                  Container(
+                    height: 20,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        taskTextView(item.car_trailerNumber),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
@@ -704,11 +831,28 @@ class TeslaTaskCarriageManagerPageState
         child: Column(
           children: <Widget>[
             carCxNumberEditView(),
-            carriageView(),
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.only(top: 5),
-                child: _areaViewData(),
+            Visibility(
+              visible: carNumberVisible,
+              maintainSize: false,
+              child: Expanded(
+                child:  ListView(
+                  children: this._getCarInfoListViewData(),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: !carNumberVisible,
+              maintainSize: false,
+              child: carriageView(),
+            ),
+            Visibility(
+              visible: !carNumberVisible,
+              maintainSize: false,
+              child: Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: _areaViewData(),
+                ),
               ),
             ),
           ],
