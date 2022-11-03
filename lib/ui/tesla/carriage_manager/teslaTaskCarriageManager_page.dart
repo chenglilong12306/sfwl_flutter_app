@@ -11,8 +11,10 @@ import '../../../Global.dart';
 import '../../../common/net/Api.dart';
 import '../../../common/net/Dio_utils.dart';
 import '../../../common/utils/JsonUtil.dart';
+import '../../../model/TeslaCarTrackInfoModel.dart';
 import '../../../model/TslTypeModel.dart';
 import '../../../model/request/getTeslaCarTrackAreaInfoModel.dart';
+import '../../../model/request/getTeslaCarTrackByCarNumberModel.dart';
 import '../../../model/request/getTslInOutTypeInfoModel.dart';
 import '../../../model/request/getTslTransportTaskListModel.dart';
 import '../../../utils/LocationUtil.dart';
@@ -51,7 +53,11 @@ class TeslaTaskCarriageManagerPageState
 
   /**库区列表*/
   List<TslCarTrackAreaInfoModel> areaList = <TslCarTrackAreaInfoModel>[];
-  var areaListValue;
+  late TslCarTrackAreaInfoModel areaListValue = TslCarTrackAreaInfoModel.init();
+
+  /**特斯拉车厢跟踪列表*/
+  List<TeslaCarTrackInfo> carTrackInfoList = <TeslaCarTrackInfo>[];
+  late TeslaCarTrackInfo carTrackInfoListValue = TeslaCarTrackInfo.init();
 
   /**车厢停放位置*/
   var addressSelectItemValue = "tcc";
@@ -188,7 +194,7 @@ class TeslaTaskCarriageManagerPageState
       tips: true,
     );
     areaList.clear();
-    areaListValue = null;
+    areaListValue = TslCarTrackAreaInfoModel.init();
     areaLineInfoValue = "1";
     areaColumnInfoValue = "1";
     for (var item in res.data) {
@@ -206,6 +212,83 @@ class TeslaTaskCarriageManagerPageState
       }
       for (int i = 0; i < trackAreaInfoModel.area_columnSum; i++) {
         areaColumnInfoList.add((i + 1).toString());
+      }
+    }
+    setState(() {});
+  }
+
+  void getTeslaCarTrackByCarNumber(String car_id) async {
+    ///根据车牌查询最新的跟踪记录
+    getTeslaCarTrackByCarNumberModel getTeslaCarTrackByCarNumber =
+        new getTeslaCarTrackByCarNumberModel(
+            Global.spUtil.getString(Constants.USERID).toString(),
+            Global.spUtil.getString(Constants.USERCOMID).toString(),
+            car_id);
+    final res = await HttpUtils.instance.post(
+      Api.getTeslaCarTrackByCarNumber,
+      params: JsonUtil.setPostRequestParams(
+              json.encode(getTeslaCarTrackByCarNumber),
+              Global.spUtil.getString(Constants.USERID).toString())
+          .toJson(),
+      tips: true,
+    );
+    carTrackInfoList.clear();
+    carTrackInfoListValue = TeslaCarTrackInfo.init();
+    areaLineInfoValue = "1";
+    areaColumnInfoValue = "1";
+    for (var item in res.data) {
+      TeslaCarTrackInfo carTrackInfo = TeslaCarTrackInfo.fromJson(item);
+      carTrackInfoList.add(carTrackInfo);
+    }
+    if (carTrackInfoList.length > 0 &&
+        addressModelList.length > 0 &&
+        areaList.length > 0) {
+      carTrackInfoListValue = carTrackInfoList[0];
+      for (int i = 0; i < addressModelList.length; i++) {
+        if (carTrackInfoListValue.teslact_locationType ==
+            addressModelList[i].code) {
+          addressSelectItemValue = addressModelList[i].code;
+          break;
+        }
+      }
+      for (int i = 0; i < areaList.length; i++) {
+        if (carTrackInfoListValue.teslact_stoAreaId == areaList[i].area_id) {
+          areaListValue = areaList[i];
+          if (areaLineInfoList.length > 0) {
+            areaLineInfoList.clear();
+          }
+          if (areaColumnInfoList.length > 0) {
+            areaColumnInfoList.clear();
+          }
+          for (int i = 0; i < areaListValue.area_lineSum; i++) {
+            areaLineInfoList.add((i + 1).toString());
+          }
+          for (int i = 0; i < areaListValue.area_columnSum; i++) {
+            areaColumnInfoList.add((i + 1).toString());
+          }
+          for (int k = 0; k < areaLineInfoList.length; k++) {
+            if (carTrackInfoListValue.teslact_line ==
+                int.parse(areaLineInfoList[k])) {
+              areaLineInfoValue = areaLineInfoList[k];
+              break;
+            }
+          }
+          for (int k = 0; k < areaColumnInfoList.length; k++) {
+            if (carTrackInfoListValue.teslact_column ==
+                int.parse(areaColumnInfoList[k])) {
+              areaColumnInfoValue = areaColumnInfoList[k];
+              break;
+            }
+          }
+          break;
+        }
+      }
+      for (int k = 0; k < vehicleTypeInfoList.length; k++) {
+        if (carTrackInfoListValue.teslact_vehicleType ==
+            vehicleTypeInfoList[k].code) {
+          vehicleTypeInfoValue = vehicleTypeInfoList[k].code;
+          break;
+        }
       }
     }
     setState(() {});
@@ -293,6 +376,22 @@ class TeslaTaskCarriageManagerPageState
   Widget taskTextView2(String text) {
     return Expanded(
         flex: 1,
+        child: Container(
+          alignment: Alignment(0, 0),
+          child: Text(
+            text,
+            style: TextStyle(color: Colors.lightBlue),
+            textScaleFactor: 1.2,
+          ),
+        ));
+  }
+
+  /**
+   * 列表的文字展示控件
+   */
+  Widget taskTextView3(String text) {
+    return Expanded(
+        flex: 2,
         child: Container(
           alignment: Alignment(0, 0),
           child: Text(
@@ -588,6 +687,23 @@ class TeslaTaskCarriageManagerPageState
     return Column(
       children: [
         sizeBoxLevel(),
+        Visibility(
+          visible: carTrackInfoListValue.car_trailerNumber == "" ? false : true,
+          child:Container(
+            height: 50,
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                sizeBoxVertical(),
+                taskTextView("集装箱号"),
+                sizeBoxVertical(),
+                taskTextView3(carTrackInfoListValue.car_trailerNumber),
+                sizeBoxVertical(),
+              ],
+            ),
+          ),
+        ),
+        sizeBoxLevel(),
         Container(
           height: 50,
           child: Row(
@@ -614,8 +730,9 @@ class TeslaTaskCarriageManagerPageState
                 flex: 2,
                 child: Row(
                   children: [
-                    taskTextView2(
-                        areaListValue == null ? "选择库区" : areaListValue),
+                    taskTextView2(areaListValue == null
+                        ? "选择库区"
+                        : areaListValue.area_name),
                     sizeBoxVertical(),
                     areaLineInfoTextView(areaLineInfoList),
                     sizeBoxVertical(),
@@ -672,7 +789,7 @@ class TeslaTaskCarriageManagerPageState
   Widget areaView(TslCarTrackAreaInfoModel item) {
     return InkWell(
       onTap: () {
-        areaListValue = item.area_name;
+        areaListValue = item;
         areaLineInfoValue = "1";
         areaColumnInfoValue = "1";
         for (TslCarTrackAreaInfoModel model in areaList) {
@@ -767,8 +884,8 @@ class TeslaTaskCarriageManagerPageState
         carInfo = item;
         carInfoList.clear();
         carNumberVisible = false;
+        getTeslaCarTrackByCarNumber(item.car_id);
         setState(() {});
-
       },
       child: Container(
         //设置外边距
@@ -835,11 +952,12 @@ class TeslaTaskCarriageManagerPageState
               visible: carNumberVisible,
               maintainSize: false,
               child: Expanded(
-                child:  ListView(
+                child: ListView(
                   children: this._getCarInfoListViewData(),
                 ),
               ),
             ),
+
             Visibility(
               visible: !carNumberVisible,
               maintainSize: false,

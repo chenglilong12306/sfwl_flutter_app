@@ -110,4 +110,11 @@ class TslCarTrackAreaInfoModel{
         jsonStr['area_isSelect'] == null ? false : true);
   }
 
+  /**
+   * 初始化
+   */
+  factory TslCarTrackAreaInfoModel.init() {
+    return TslCarTrackAreaInfoModel("", "", "", "", "", "", "", 0, 0, 0, 0, false);
+  }
+
 }
