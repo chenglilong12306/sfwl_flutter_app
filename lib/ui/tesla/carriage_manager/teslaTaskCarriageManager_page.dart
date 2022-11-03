@@ -17,6 +17,7 @@ import '../../../model/request/getTeslaCarTrackAreaInfoModel.dart';
 import '../../../model/request/getTeslaCarTrackByCarNumberModel.dart';
 import '../../../model/request/getTslInOutTypeInfoModel.dart';
 import '../../../model/request/getTslTransportTaskListModel.dart';
+import '../../../model/request/setTslTaskCarTrackModel.dart';
 import '../../../utils/LocationUtil.dart';
 
 /**
@@ -38,12 +39,14 @@ class TeslaTaskCarriageManagerPageState
     with
         AutomaticKeepAliveClientMixin<TeslaTaskCarriageManagerPage>,
         WidgetsBindingObserver {
+  var _isButtonSubmit = true;
+
   TextEditingController _carNumberController = TextEditingController();
   var carNumberVisible = false;
 
-  /**库区列表*/
+  /**车辆信息*/
   List<BasCarInfoModel> carInfoList = <BasCarInfoModel>[];
-  var carInfo;
+  late BasCarInfoModel carInfo = BasCarInfoModel.init();
 
   /**库区库位行列数*/
   List<String> areaLineInfoList = <String>[];
@@ -59,12 +62,14 @@ class TeslaTaskCarriageManagerPageState
   List<TeslaCarTrackInfo> carTrackInfoList = <TeslaCarTrackInfo>[];
   late TeslaCarTrackInfo carTrackInfoListValue = TeslaCarTrackInfo.init();
 
-  /**车厢停放位置*/
+  /**车厢停放位置 -- 所在场所*/
   var addressSelectItemValue = "tcc";
+  var addressTypeCodeName;
   List<TslTypeModel> addressModelList = <TslTypeModel>[];
 
   /**车厢类型接口*/
   var vehicleTypeInfoValue;
+  var vehicleTypeInfoValueName;
   List<TslTypeModel> vehicleTypeInfoList = <TslTypeModel>[];
 
   /**进出类型--进出*/
@@ -73,6 +78,7 @@ class TeslaTaskCarriageManagerPageState
 
   /**进出类型*/
   var inOutTypeInfoValue = "";
+  var inOutTypeInfoValueName;
   List<TslTypeModel> inOutTypeInfoList = <TslTypeModel>[];
 
   /*进入*/
@@ -217,6 +223,37 @@ class TeslaTaskCarriageManagerPageState
     setState(() {});
   }
 
+  void setTslTaskCarTrack() async {
+    ///设置车厢所在库区
+    setTslTaskCarTrackModel setTslTaskCarTrack = new setTslTaskCarTrackModel(
+        Global.spUtil.getString(Constants.USERID).toString(),
+        Global.spUtil.getString(Constants.USERCOMID).toString(),
+        carInfo.car_number,
+        carInfo.car_id,
+        _loadLon,
+        _loadLat,
+        _loadAddress,
+        addressSelectItemValue,
+        areaListValue.area_name,
+        areaListValue.area_id,
+        int.parse(inOutInfoValue.toString()),
+        int.parse(areaLineInfoValue.toString()),
+        int.parse(areaColumnInfoValue.toString()),
+        vehicleTypeInfoValue,
+        inOutTypeInfoValue);
+
+    final res = await HttpUtils.instance.post(
+      Api.setTslTaskCarTrack,
+      params: JsonUtil.setPostRequestParams(json.encode(setTslTaskCarTrack),
+              Global.spUtil.getString(Constants.USERID).toString())
+          .toJson(),
+      tips: true,
+    );
+    carInfo = BasCarInfoModel.init();
+    _carNumberController.text = "";
+    setState(() {});
+  }
+
   void getTeslaCarTrackByCarNumber(String car_id) async {
     ///根据车牌查询最新的跟踪记录
     getTeslaCarTrackByCarNumberModel getTeslaCarTrackByCarNumber =
@@ -233,9 +270,6 @@ class TeslaTaskCarriageManagerPageState
       tips: true,
     );
     carTrackInfoList.clear();
-    carTrackInfoListValue = TeslaCarTrackInfo.init();
-    areaLineInfoValue = "1";
-    areaColumnInfoValue = "1";
     for (var item in res.data) {
       TeslaCarTrackInfo carTrackInfo = TeslaCarTrackInfo.fromJson(item);
       carTrackInfoList.add(carTrackInfo);
@@ -243,6 +277,7 @@ class TeslaTaskCarriageManagerPageState
     if (carTrackInfoList.length > 0 &&
         addressModelList.length > 0 &&
         areaList.length > 0) {
+      carTrackInfoListValue = TeslaCarTrackInfo.init();
       carTrackInfoListValue = carTrackInfoList[0];
       for (int i = 0; i < addressModelList.length; i++) {
         if (carTrackInfoListValue.teslact_locationType ==
@@ -287,6 +322,7 @@ class TeslaTaskCarriageManagerPageState
         if (carTrackInfoListValue.teslact_vehicleType ==
             vehicleTypeInfoList[k].code) {
           vehicleTypeInfoValue = vehicleTypeInfoList[k].code;
+          vehicleTypeInfoValueName = vehicleTypeInfoList[k].name;
           break;
         }
       }
@@ -429,7 +465,8 @@ class TeslaTaskCarriageManagerPageState
               margin: EdgeInsets.only(left: 5),
               child: Text(list.length == 0 ? "请选择" : list[0].name),
             ),
-            value: list.length == 0 ? "0" : list[0].code,
+            value: addressSelectItemValue =
+                list.length == 0 ? "0" : list[0].code,
           ),
           // 改变事件
           onChanged: (value) {
@@ -441,7 +478,7 @@ class TeslaTaskCarriageManagerPageState
           // 图标大小
           iconSize: 24,
           // 下拉文本样式
-          style: TextStyle(fontSize: 18.0, color: Colors.grey),
+          style: TextStyle(fontSize: 18.0, color: Colors.black54),
         ),
       ),
     );
@@ -470,11 +507,17 @@ class TeslaTaskCarriageManagerPageState
               vehicleTypeInfoValue = value.toString();
             });
           },
-          value: vehicleTypeInfoValue,
+          value: vehicleTypeInfoValue = vehicleTypeInfoValue == null
+              ? list.length == 0
+                  ? null
+                  : list[1].code
+              : vehicleTypeInfoValue,
+
+          ///使用3目运算初始化车厢类型
           // 图标大小
           iconSize: 24,
           // 下拉文本样式
-          style: TextStyle(fontSize: 18.0, color: Colors.grey),
+          style: TextStyle(fontSize: 18.0, color: Colors.black54),
         ),
       ),
     );
@@ -514,7 +557,7 @@ class TeslaTaskCarriageManagerPageState
           // 图标大小
           iconSize: 24,
           // 下拉文本样式
-          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+          style: TextStyle(fontSize: 14.0, color: Colors.black54),
         ),
       ),
     );
@@ -547,7 +590,7 @@ class TeslaTaskCarriageManagerPageState
           // 图标大小
           iconSize: 24,
           // 下拉文本样式
-          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+          style: TextStyle(fontSize: 14.0, color: Colors.black54),
         ),
       ),
     );
@@ -588,7 +631,7 @@ class TeslaTaskCarriageManagerPageState
           // 图标大小
           iconSize: 24,
           // 下拉文本样式
-          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+          style: TextStyle(fontSize: 14.0, color: Colors.black54),
         ),
       ),
     );
@@ -629,7 +672,7 @@ class TeslaTaskCarriageManagerPageState
           // 图标大小
           iconSize: 24,
           // 下拉文本样式
-          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+          style: TextStyle(fontSize: 14.0, color: Colors.black54),
         ),
       ),
     );
@@ -688,16 +731,16 @@ class TeslaTaskCarriageManagerPageState
       children: [
         sizeBoxLevel(),
         Visibility(
-          visible: carTrackInfoListValue.car_trailerNumber == "" ? false : true,
-          child:Container(
-            height: 50,
+          visible: carInfo.car_trailerNumber == "" ? false : true,
+          child: Container(
+            height: 40,
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
                 sizeBoxVertical(),
                 taskTextView("集装箱号"),
                 sizeBoxVertical(),
-                taskTextView3(carTrackInfoListValue.car_trailerNumber),
+                taskTextView3(carInfo.car_trailerNumber),
                 sizeBoxVertical(),
               ],
             ),
@@ -705,7 +748,7 @@ class TeslaTaskCarriageManagerPageState
         ),
         sizeBoxLevel(),
         Container(
-          height: 50,
+          height: 40,
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: [
@@ -719,7 +762,7 @@ class TeslaTaskCarriageManagerPageState
         ),
         sizeBoxLevel(),
         Container(
-          height: 50,
+          height: 40,
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: [
@@ -746,7 +789,7 @@ class TeslaTaskCarriageManagerPageState
         ),
         sizeBoxLevel(),
         Container(
-          height: 50,
+          height: 40,
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: [
@@ -760,7 +803,7 @@ class TeslaTaskCarriageManagerPageState
         ),
         sizeBoxLevel(),
         Container(
-          height: 50,
+          height: 40,
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: [
@@ -938,6 +981,204 @@ class TeslaTaskCarriageManagerPageState
     );
   }
 
+  /**
+   * 可变换禁用情况的按钮
+   */
+  Widget buttonView() {
+    return MaterialButton(
+      ///按钮的背景
+      color: Colors.blue,
+      child: Text("登记", style: TextStyle(color: Colors.white, fontSize: 16)),
+
+      ///点击回调函数
+      onPressed: () => _isButtonSubmit ? showDetailDialog() : null,
+
+      ///按钮按下时回调 value = true
+      ///按钮抬起时回调 value = false
+      ///要先于 onPressed
+      onHighlightChanged: (value) {
+        _isButtonSubmit = true;
+        if (_carNumberController.text.length <= 0) {
+          Fluttertoast.showToast(msg: "请选择要登记的车厢车牌号");
+          _isButtonSubmit = false;
+          return;
+        }
+        if (_loadLon == 0 || _loadLat == 0) {
+          Fluttertoast.showToast(msg: "定位地址为空！");
+          _isButtonSubmit = false;
+          return;
+        }
+        if (carInfo.car_id == null || carInfo.car_id == "") {
+          Fluttertoast.showToast(msg: "请选择要登记的车厢车牌号");
+          _isButtonSubmit = false;
+          return;
+        }
+        if (addressSelectItemValue == null) {
+          Fluttertoast.showToast(msg: "请选择所在场所");
+          _isButtonSubmit = false;
+          return;
+        } else {
+          for (TslTypeModel model in addressModelList) {
+            if (model.code == addressSelectItemValue) {
+              addressTypeCodeName = model.name;
+              break;
+            }
+          }
+        }
+        if (vehicleTypeInfoValue == null) {
+          Fluttertoast.showToast(msg: "请选择车厢类型");
+          _isButtonSubmit = false;
+          return;
+        } else {
+          for (TslTypeModel model in vehicleTypeInfoList) {
+            if (model.code == vehicleTypeInfoValue) {
+              vehicleTypeInfoValueName = model.name;
+              break;
+            }
+          }
+        }
+        if (areaListValue.area_id == null || areaListValue.area_id == "") {
+          Fluttertoast.showToast(msg: "请选择要停放的库区");
+          _isButtonSubmit = false;
+          return;
+        }
+        if (areaLineInfoValue == null || areaLineInfoValue == 0) {
+          Fluttertoast.showToast(msg: "请选择停放的行数");
+          _isButtonSubmit = false;
+          return;
+        }
+        if (areaColumnInfoValue == null || areaColumnInfoValue == 0) {
+          Fluttertoast.showToast(msg: "请选择停放的列数");
+          _isButtonSubmit = false;
+          return;
+        }
+        if (inOutInfoValue == null || "" == inOutInfoValue) {
+          Fluttertoast.showToast(msg: "请选择进入/离开");
+          _isButtonSubmit = false;
+          return;
+        }
+        if (inOutTypeInfoValue == null || "" == inOutTypeInfoValue) {
+          Fluttertoast.showToast(msg: "请选择进出类型");
+          _isButtonSubmit = false;
+          return;
+        } else {
+          for (TslTypeModel model in inOutTypeInfoList) {
+            if (model.code == inOutTypeInfoValue) {
+              inOutTypeInfoValueName = model.name;
+              break;
+            }
+          }
+        }
+      },
+
+      ///定义按钮的基色，以及按钮的最小尺寸
+      ///ButtonTextTheme.accent 按钮显示的文本 ThemeData.accentColor(MaterialApp组件中的theme属性配制的)
+      ///ButtonTextTheme. normal 按钮显示的文本 黑色或者白色 具体取决于ThemeData.brightness Brightness.dark
+      ///ButtonTextTheme.primary 按钮的显示的文本 ThemeData.primaryColr
+      textTheme: ButtonTextTheme.primary,
+
+      ///配制按钮上文本的颜色
+      textColor: Colors.deepOrange,
+
+      ///未设置点击时的背景颜色
+      disabledColor: Colors.grey,
+
+      ///按钮点击下的颜色
+      highlightColor: Colors.deepPurple,
+
+      ///水波方的颜色
+      splashColor: Colors.green,
+
+      ///按钮的阴影
+      elevation: 10,
+
+      ///按钮按下时的阴影高度
+      highlightElevation: 20,
+
+      ///未设置点击时的阴影高度
+      disabledElevation: 5.0,
+
+      ///用来设置按钮的边框的样式
+      /// Border.all(color: Colors.deepOrange,width: 2.5,style:  BorderStyle.solid) 四个边框
+      /// Border(bottom: BorderSide(color: Colors.deepOrange,width: 2.5,style:  BorderStyle.solid)) 可以分别设置边框
+      /// 用来设置底部边框的
+      /// UnderlineInputBorder(borderSide: BorderSide(color: Colors.deepOrange,width: 2.5,style:  BorderStyle.solid),borderRadius: BorderRadius.circular(10))
+      /// 用来设置圆角矩形边框
+      ///   RoundedRectangleBorder(side: BorderSide.none,borderRadius: BorderRadius.all(Radius.circular(20)))
+      ///   用来设置圆形边框
+      ///   CircleBorder(side: BorderSide(width: 2,color:Colors.red )),
+      ///   椭圆形边框 StadiumBorder(side: BorderSide(width: 2,color: Colors.red))
+      ///   设置 多边形 BeveledRectangleBorder(side: BorderSide(width: 2,color: Colors.red),borderRadius: BorderRadius.all(Radius.circular(20)))
+      ///
+      shape: RoundedRectangleBorder(
+          side: BorderSide.none,
+          borderRadius: BorderRadius.all(Radius.circular(20))),
+      height: 44.0,
+      minWidth: 200,
+    );
+  }
+
+  /**
+   * 登记提交弹窗
+   */
+  showDetailDialog() {
+    showDialog<Null>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('提示'),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text("车牌：" +
+                    carInfo.car_number +
+                    "(" +
+                    vehicleTypeInfoValueName +
+                    ")"),
+                new Text("集装箱号：" + carInfo.car_trailerNumber),
+                new Text(
+                  "因：" +
+                      inOutTypeInfoValueName +
+                      (inOutInfoValue == "1" ? " 进入" : " 离开"),
+                  style: TextStyle(color: Colors.red),
+                ),
+                new Text(
+                  addressTypeCodeName +
+                      " : " +
+                      areaListValue.area_name +
+                      "-" +
+                      areaLineInfoValue +
+                      "-" +
+                      areaColumnInfoValue,
+                  style: TextStyle(color: Colors.blue),
+                ),
+                new Text("即将提交登记信息，请谨慎操作！确认提交？"),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text('确定'),
+              onPressed: () {
+                setTslTaskCarTrack();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    ).then((val) {
+      print(val);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // See AutomaticKeepAliveClientMixin.
@@ -957,7 +1198,6 @@ class TeslaTaskCarriageManagerPageState
                 ),
               ),
             ),
-
             Visibility(
               visible: !carNumberVisible,
               maintainSize: false,
@@ -973,6 +1213,7 @@ class TeslaTaskCarriageManagerPageState
                 ),
               ),
             ),
+            buttonView(),
           ],
         ),
       ),

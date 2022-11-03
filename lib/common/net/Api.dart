@@ -33,5 +33,7 @@ class Api {
   static const getCarInfoList = 'Api/TslTransportManager/TslTransportTask/getCarInfoList';
   /// 根据车牌查询最新的跟踪记录
   static const getTeslaCarTrackByCarNumber = 'Api/TslTransportManager/TslTransportTask/getTeslaCarTrackByCarNumber';
+  /// 车厢位置跟踪登记
+  static const setTslTaskCarTrack = 'Api/TslTransportManager/TslTransportTask/setTslTaskCarTrack';
 }
 

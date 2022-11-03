@@ -104,4 +104,9 @@ class BasCarInfoModel {
       jsonStr['car_trailerNumber'] != null ? jsonStr['car_trailerNumber'] : "",
     );
   }
+
+
+  factory BasCarInfoModel.init() {
+    return BasCarInfoModel("","","","","","","","","","","");
+  }
 }
