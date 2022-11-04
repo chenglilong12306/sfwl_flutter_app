@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 class Api {
   static const baseUrl = kDebugMode ? 'https://appsvcx.sfwl.net/' : 'https://appsvcx.sfwl.net/';
+  // static const baseUrl = kDebugMode ? 'http://10.10.10.90:8084/' : 'http://10.10.10.90:8084/';
 
   /// 获取token
   static const tokenUrl = 'api/token/getToken';
@@ -37,5 +38,7 @@ class Api {
   static const setTslTaskCarTrack = 'Api/TslTransportManager/TslTransportTask/setTslTaskCarTrack';
   /// 根据场地类型获取车厢库存数量
   static const getInventoryQueryListByLocationType = 'Api/TslTransportManager/TslTransportTask/getInventoryQueryListByLocationType';
+  /// 查询库区库存情况
+  static const getInventoryQueryListAreaDetails = 'Api/TslTransportManager/TslTransportTask/getInventoryQueryListAreaDetails';
 }
 

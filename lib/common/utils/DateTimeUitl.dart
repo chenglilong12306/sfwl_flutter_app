@@ -101,4 +101,45 @@ class DateTimeUtil {
   }
 
 
+  /**
+   * 两个日期的间隔 返回天数
+   *
+   * @param startDate
+   * @param endDate
+   * @return
+   */
+  static int dateDiffDays(DateTime startDate, DateTime endDate) {
+    var difference = startDate.difference(endDate);
+    return difference.inDays;
+  }
+
+  /**
+   * 两个日期的间隔 返回小时
+   *
+   * @param startDate
+   * @param endDate
+   * @return
+   */
+  static int dateDiffHours(DateTime startDate, DateTime endDate) {
+    var difference = startDate.difference(endDate);
+    if(difference.inHours > 0){
+      return difference.inHours;
+    }else {
+      return -difference.inHours;
+    }
+  }
+
+  /**
+   * 两个日期的间隔 返回分钟数
+   *
+   * @param startDate
+   * @param endDate
+   * @return
+   */
+  static int dateDiffMinutes(DateTime startDate, DateTime endDate) {
+    var difference = startDate.difference(endDate);
+    return difference.inMinutes;
+  }
+
+
 }

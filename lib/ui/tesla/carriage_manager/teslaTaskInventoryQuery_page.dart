@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:sfwl_flutter_app/ui/tesla/carriage_manager/teslaTaskInventoryQueryArea_page.dart';
 
 import '../../../Constants.dart';
 import '../../../Global.dart';
@@ -10,7 +11,6 @@ import '../../../common/utils/JsonUtil.dart';
 import '../../../model/TslCarTrackAreaInfoModel.dart';
 import '../../../model/TslTypeModel.dart';
 import '../../../model/request/getInventoryQueryListByLocationTypeModel.dart';
-import '../../../model/request/getTeslaCarTrackAreaInfoModel.dart';
 import '../../../model/request/getTslTransportTaskListModel.dart';
 
 /**
@@ -236,7 +236,7 @@ class TeslaTaskInventoryQueryPageState
           // 图标大小
           iconSize: 24,
           // 下拉文本样式
-          style: TextStyle(fontSize: 18.0, color: Colors.black54),
+          style: TextStyle(fontSize: 18.0, color: Colors.black26),
         ),
       ),
     );
@@ -302,6 +302,9 @@ class TeslaTaskInventoryQueryPageState
     return InkWell(
       onTap: () {
         areaListValue = item;
+        ///跳转特斯拉项目--车厢管理--库存查询
+        ///带返回刷新数据的跳转
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TeslaTaskInventoryQueryAreaPage(item))).then((value) => getInventoryQueryListByLocationType(addressSelectItemValue));
         setState(() {});
       },
       child: Container(
