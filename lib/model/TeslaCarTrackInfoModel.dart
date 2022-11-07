@@ -4,7 +4,7 @@
  * @Date 2022/11/2 17:33
  */
 
-class TeslaCarTrackInfo {
+class TeslaCarTrackInfoModel {
 
   /**
    * ID
@@ -97,7 +97,7 @@ class TeslaCarTrackInfo {
    */
   late String teslact_inOutType;
 
-  TeslaCarTrackInfo(
+  TeslaCarTrackInfoModel(
       this.teslact_id
       ,this.teslact_carNumber
       ,this.teslact_carid
@@ -148,8 +148,8 @@ class TeslaCarTrackInfo {
   };
 
 
-  factory TeslaCarTrackInfo.fromJson(Map<String, dynamic> jsonStr) {
-    return TeslaCarTrackInfo(
+  factory TeslaCarTrackInfoModel.fromJson(Map<String, dynamic> jsonStr) {
+    return TeslaCarTrackInfoModel(
       jsonStr['teslact_id'],
       jsonStr['teslact_carNumber'],
       jsonStr['teslact_carid'],
@@ -163,8 +163,8 @@ class TeslaCarTrackInfo {
       jsonStr['teslact_lastestLatitude'],
       jsonStr['teslact_stoAreaName'] != null ? jsonStr['teslact_stoAreaName'] : "",
       jsonStr['teslact_stoAreaId'] != null ? jsonStr['teslact_stoAreaId'] : "",
-      jsonStr['teslact_action'] != null ? jsonStr['teslact_action'] : "",
-      jsonStr['teslact_lastestType'] != null ? jsonStr['teslact_lastestType'] : "",
+      jsonStr['teslact_action'],
+      jsonStr['teslact_lastestType'],
       jsonStr['teslact_line'],
       jsonStr['teslact_column'],
       jsonStr['teslact_vehicleType'] != null ? jsonStr['teslact_vehicleType'] : "",
@@ -177,8 +177,8 @@ class TeslaCarTrackInfo {
   /**
    * 初始化
    */
-  factory TeslaCarTrackInfo.init() {
-    return TeslaCarTrackInfo("", "", "", "", "", "", 0, "", "", 0, 0, "", "", 0, 0, 0, 0, "", 0, "", "");
+  factory TeslaCarTrackInfoModel.init() {
+    return TeslaCarTrackInfoModel("", "", "", "", "", "", 0, "", "", 0, 0, "", "", 0, 0, 0, 0, "", 0, "", "");
   }
 
 }

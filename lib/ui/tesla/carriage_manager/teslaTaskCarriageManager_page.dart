@@ -59,8 +59,8 @@ class TeslaTaskCarriageManagerPageState
   late TslCarTrackAreaInfoModel areaListValue = TslCarTrackAreaInfoModel.init();
 
   /**特斯拉车厢跟踪列表*/
-  List<TeslaCarTrackInfo> carTrackInfoList = <TeslaCarTrackInfo>[];
-  late TeslaCarTrackInfo carTrackInfoListValue = TeslaCarTrackInfo.init();
+  List<TeslaCarTrackInfoModel> carTrackInfoList = <TeslaCarTrackInfoModel>[];
+  late TeslaCarTrackInfoModel carTrackInfoListValue = TeslaCarTrackInfoModel.init();
 
   /**车厢停放位置 -- 所在场所*/
   var addressSelectItemValue = "tcc";
@@ -271,13 +271,13 @@ class TeslaTaskCarriageManagerPageState
     );
     carTrackInfoList.clear();
     for (var item in res.data) {
-      TeslaCarTrackInfo carTrackInfo = TeslaCarTrackInfo.fromJson(item);
+      TeslaCarTrackInfoModel carTrackInfo = TeslaCarTrackInfoModel.fromJson(item);
       carTrackInfoList.add(carTrackInfo);
     }
     if (carTrackInfoList.length > 0 &&
         addressModelList.length > 0 &&
         areaList.length > 0) {
-      carTrackInfoListValue = TeslaCarTrackInfo.init();
+      carTrackInfoListValue = TeslaCarTrackInfoModel.init();
       carTrackInfoListValue = carTrackInfoList[0];
       for (int i = 0; i < addressModelList.length; i++) {
         if (carTrackInfoListValue.teslact_locationType ==

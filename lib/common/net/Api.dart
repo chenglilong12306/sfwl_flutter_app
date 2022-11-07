@@ -40,5 +40,7 @@ class Api {
   static const getInventoryQueryListByLocationType = 'Api/TslTransportManager/TslTransportTask/getInventoryQueryListByLocationType';
   /// 查询库区库存情况
   static const getInventoryQueryListAreaDetails = 'Api/TslTransportManager/TslTransportTask/getInventoryQueryListAreaDetails';
+  /// 查询车厢库存情况
+  static const getInventoryQueryListCarDetails = 'Api/TslTransportManager/TslTransportTask/getInventoryQueryListCarDetails';
 }
 

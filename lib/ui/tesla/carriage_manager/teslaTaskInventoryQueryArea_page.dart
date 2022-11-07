@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sfwl_flutter_app/common/utils/DateTimeUitl.dart';
 import 'package:sfwl_flutter_app/model/TeslaCarTrackInfoModel.dart';
+import 'package:sfwl_flutter_app/ui/tesla/carriage_manager/teslaTaskInventoryQueryAreaCar_page.dart';
 
 import '../../../Constants.dart';
 import '../../../Global.dart';
@@ -54,7 +55,7 @@ class TeslaTaskInventoryQueryAreaPageState
   var areaListCode;
 
   /**特斯拉车厢跟踪主表列表*/
-  List<TeslaCarTrackInfo> carTrackInfoList = <TeslaCarTrackInfo>[];
+  List<TeslaCarTrackInfoModel> carTrackInfoList = <TeslaCarTrackInfoModel>[];
 
   @override
   void initState() {
@@ -327,7 +328,7 @@ class TeslaTaskInventoryQueryAreaPageState
       carTrackInfoList.clear();
     }
     for (var item in res.data) {
-      TeslaCarTrackInfo carTrackInfo = TeslaCarTrackInfo.fromJson(item);
+      TeslaCarTrackInfoModel carTrackInfo = TeslaCarTrackInfoModel.fromJson(item);
       carTrackInfoList.add(carTrackInfo);
     }
     setState(() {});
@@ -336,93 +337,106 @@ class TeslaTaskInventoryQueryAreaPageState
   List<Widget> _getListViewData() {
     List<Widget> list = [];
     print("开始渲染数据" + list.length.toString());
-    for (TeslaCarTrackInfo item in carTrackInfoList) {
+    for (TeslaCarTrackInfoModel item in carTrackInfoList) {
       list.add(listItemView(item));
     }
 
     return list;
   }
 
-  Widget listItemView(TeslaCarTrackInfo item) {
-    var timeInterval = DateTimeUtil.dateDiffHours(DateTimeUtil.getTimeStampSwitchDateTime(int.parse(item.teslact_latestTime.toString())),DateTimeUtil.getDateTimeNew());
-
-    return Column(
-      children: [
-        Container(
-          color: Colors.white,
-          constraints: BoxConstraints(minHeight: 40),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  children: [
-                    Text(
-                      item.teslact_carNumber,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.lightBlue),
-                    ),
-                    Visibility(
-                      visible: item.teslact_carNumber != "",
-                      child: Text(
-                        item.car_trailerNumber,
+  Widget listItemView(TeslaCarTrackInfoModel item) {
+    var timeInterval = DateTimeUtil.dateDiffHours(
+        DateTimeUtil.getTimeStampSwitchDateTime(
+            int.parse(item.teslact_latestTime.toString())),
+        DateTimeUtil.getDateTimeNew());
+    return InkWell(
+      onTap: () {
+        ///跳转特斯拉项目--车厢管理--车厢详情
+        ///带返回刷新数据的跳转
+        Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        TeslaTaskInventoryQueryAreaCarPage(item)))
+            .then((value) => getDateList(addressSelectItemValue, areaListCode));
+        setState(() {});
+      },
+      child: Column(
+        children: [
+          Container(
+            color: Colors.white,
+            constraints: BoxConstraints(minHeight: 40),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      Text(
+                        item.teslact_carNumber,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: Colors.lightBlue),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              sizeBoxVertical(),
-              Expanded(
-                flex: 1,
-                child: Text(
-                  item.teslact_line.toString() +
-                      "-" +
-                      item.teslact_column.toString(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-              sizeBoxVertical(),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  item.teslact_vehicleType ,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-              sizeBoxVertical(),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  DateTimeUtil.getDateTimeSwitchString(
-                      DateTimeUtil.getTimeStampSwitchDateTime(
-                          int.parse(item.teslact_latestTime.toString())),
-                      DateTimeUtil.YYYY_MM_DD_HH_MM_SS),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: timeInterval > 48
-                        ? Colors.red
-                        : Colors.lightBlue,
+                      Visibility(
+                        visible: item.teslact_carNumber != "",
+                        child: Text(
+                          item.car_trailerNumber,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              sizeBoxVertical(),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  item.teslact_inOutType,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
+                sizeBoxVertical(),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    item.teslact_line.toString() +
+                        "-" +
+                        item.teslact_column.toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
-              ),
-            ],
+                sizeBoxVertical(),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    item.teslact_vehicleType,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                sizeBoxVertical(),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    DateTimeUtil.getDateTimeSwitchString(
+                        DateTimeUtil.getTimeStampSwitchDateTime(
+                            int.parse(item.teslact_latestTime.toString())),
+                        DateTimeUtil.YYYY_MM_DD_HH_MM_SS),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: timeInterval > 48 ? Colors.red : Colors.lightBlue,
+                    ),
+                  ),
+                ),
+                sizeBoxVertical(),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    item.teslact_inOutType,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        sizeBoxLevel(),
-      ],
+          sizeBoxLevel(),
+        ],
+      ),
     );
   }
 
